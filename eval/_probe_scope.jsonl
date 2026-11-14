@@ -1,0 +1,8 @@
+{"id": "n01", "type": "single", "question": "房东不退押金怎么办", "gold": [], "keywords": [], "must_refuse": false, "note": "越界与计算探针"}
+{"id": "n02", "type": "single", "question": "朋友借钱不还，没有借条能起诉吗", "gold": [], "keywords": [], "must_refuse": false, "note": "越界与计算探针"}
+{"id": "n03", "type": "single", "question": "离婚的时候房子怎么分", "gold": [], "keywords": [], "must_refuse": false, "note": "越界与计算探针"}
+{"id": "n04", "type": "single", "question": "网购的东西有质量问题怎么退", "gold": [], "keywords": [], "must_refuse": false, "note": "越界与计算探针"}
+{"id": "n05", "type": "single", "question": "被辞退，经济补偿金怎么算，我干了3年7个月", "gold": [], "keywords": [], "must_refuse": false, "note": "越界与计算探针"}
+{"id": "n06", "type": "single", "question": "工伤十级一次性伤残补助金是几个月工资", "gold": ["工伤保险条例_37"], "keywords": ["7个月"], "must_refuse": false, "note": "越界与计算探针；v81 后工伤十级补助金落 37 条，需压住 v80 的经济补偿折算"}
+{"id": "n07", "type": "single", "question": "老板跑路了，工资还能要回来吗", "gold": [], "keywords": [], "must_refuse": false, "note": "越界与计算探针"}
+{"id": "n08", "type": "single", "question": "公司拖欠工资，我能要多少赔偿金", "gold": [], "keywords": [], "must_refuse": false, "note": "越界与计算探针"}

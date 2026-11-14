@@ -1,0 +1,8 @@
+{"id": "c15", "type": "single", "question": "试用期三个月到了，公司又让我再试用三个月", "gold": ["劳动合同法_19"], "keywords": ["一次"], "must_refuse": false, "note": "口语版：同一单位同一劳动者只能约定一次试用期"}
+{"id": "c16", "type": "single", "question": "公司把我身份证押着不还给我", "gold": ["劳动合同法_9"], "keywords": ["扣押"], "must_refuse": false, "note": "口语版：不得扣押劳动者证件"}
+{"id": "c17", "type": "single", "question": "我怀孕了，公司让我自己写辞职信", "gold": ["劳动合同法_42"], "keywords": ["孕期"], "must_refuse": false, "note": "口语版：三期女职工不得解除"}
+{"id": "c18", "type": "single", "question": "离职了公司不给我开离职证明", "gold": ["劳动合同法_50"], "keywords": ["解除"], "must_refuse": false, "note": "口语版：出具解除证明并办理档案转移"}
+{"id": "c19", "type": "single", "question": "公司让我一天干十二个钟头", "gold": ["劳动法_41"], "keywords": ["三小时"], "must_refuse": false, "note": "口语版：延长工作时间上限"}
+{"id": "c20", "type": "single", "question": "我是劳务派遣的，工资比正式工少一半", "gold": ["劳动合同法_63"], "keywords": ["同工同酬"], "must_refuse": false, "note": "口语版：被派遣劳动者同工同酬"}
+{"id": "c21", "type": "single", "question": "厂子倒闭了，欠我的工资还能拿到吗", "gold": ["劳动合同法_44"], "keywords": ["破产"], "must_refuse": false, "note": "口语版：用人单位破产导致合同终止"}
+{"id": "c22", "type": "single", "question": "入职时公司让我签协议，说以后出了工伤自己负责", "gold": ["劳动合同法_26"], "keywords": ["无效"], "must_refuse": false, "note": "口语版：免除单位法定责任的条款无效"}

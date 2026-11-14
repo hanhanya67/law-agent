@@ -1,0 +1,10 @@
+{"id": "e01", "type": "single", "question": "旧合同法关于试用期工资的规定还有效吗", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e02", "type": "single", "question": "劳动合同法第八十二条和第十条有什么区别", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e03", "type": "single", "question": "合同到期公司说不续签了，我能要补偿吗", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e04", "type": "single", "question": "公司让我签竞业协议但一直没给补偿，协议还算数吗", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e05", "type": "single", "question": "被辞退后公司不给开离职证明，怎么办", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e06", "type": "single", "question": "民法典第五百八十五条和旧合同法第一百一十四条内容一样吗", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e07", "type": "single", "question": "劳动法第四十四条第一款怎么理解", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e08", "type": "single", "question": "公司一直没交社保，我自己辞职能不能要补偿", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}
+{"id": "e09", "type": "single", "question": "工伤认定一般要多久出结果", "gold": ["工伤保险条例_20"], "keywords": ["60日", "15日"], "must_refuse": false, "note": "边界探针；v81 后落 20 条（60日/15日），需压住 27 条的仲裁时效补充句"}
+{"id": "e10", "type": "single", "question": "老板用个人微信给我发工资，这算劳动关系吗", "gold": [], "keywords": [], "must_refuse": false, "note": "边界探针"}

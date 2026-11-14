@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0e14">
+<title>登录 · 多领域法规问答</title>
+<!-- v131：首帧前钉死配色，只读 localStorage，不看系统。见 index.html 同段注释。 -->
+<script>try{var _t=localStorage.getItem('law.theme');
+document.documentElement.setAttribute('data-theme',_t==='dark'?'dark':'light');}catch(e){}</script>
+<link rel="stylesheet" href="/assets/theme.css?v=131">
+<style>
+  /* 登录页自成一套「夜色宣纸」皮肤，不吃主站那五套法域纸色令牌：
+     主站每部法一套纸色是「进到案子里」的语境，登录页还没进任何案子，
+     不该先替用户选一部法。这里的深浅是**自动缓慢变换**的，不提供手动开关
+     （v124：用户要的是循环动画，不是一个要去找的按钮）。 */
+  :root{
+    --lg-ink:#0b0e14; --lg-glass:rgba(15,19,27,.78);
+    --lg-glass-2:rgba(22,27,37,.72);
+    --lg-gold:#d9b877; --lg-gold-soft:rgba(217,184,119,.16);
+    --lg-gold-line:rgba(217,184,119,.28);
+    --lg-red:#c9554a; --lg-red-h:#e0705f;
+    --lg-text:#f3eee3; --lg-dim:#a7a294; --lg-line:rgba(217,184,119,.18);
+  }
+
+  html,body{height:100%}
+  body.login-page{
+    margin:0;display:flex;align-items:center;justify-content:center;
+    padding:36px 20px 42px;overflow-x:hidden;
+    color:var(--lg-text);background:var(--lg-ink);
+    font-family:inherit;
+    animation:lg-daynight 54s ease-in-out infinite;
+  }
+  /* 自动明暗：只在「深墨 ↔ 暖金夜色」之间呼吸，不真的翻成白底 ——
+     卡片外的背景变亮时卡片仍是深色玻璃，白字始终可读。真切成浅色底
+     就得让整套文字跟着反色，那不是动画，是每 54 秒坏一次对比度。 */
+  @keyframes lg-daynight{
+    0%,100%{background-color:#0b0e14}
+    28%    {background-color:#14131a}
+    50%    {background-color:#241d18}
+    72%    {background-color:#121725}
+  }
+
+  /* ---------------------------------------------------------- 背景四层 */
+  .lg-bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+  /* 1) 流动极光：三个色团各自缓慢漂移，blur 把它们揉成一片 */
+  .lg-aurora{
+    position:absolute;inset:-35%;
+    background:
+      radial-gradient(36% 40% at 22% 30%, rgba(201,85,74,.34), transparent 70%),
+      radial-gradient(33% 38% at 79% 26%, rgba(68,110,170,.32), transparent 70%),
+      radial-gradient(42% 44% at 56% 80%, rgba(217,184,119,.24), transparent 72%),
+      radial-gradient(28% 30% at 12% 82%, rgba(90,140,120,.20), transparent 72%);
+    filter:blur(34px);opacity:.9;
+    animation:lg-drift 28s ease-in-out infinite alternate;
+  }
+  @keyframes lg-drift{
+    0%  {transform:translate3d(-3%,-2%,0) scale(1)}
+    50% {transform:translate3d( 4%, 3%,0) scale(1.09)}
+    100%{transform:translate3d(-2%, 5%,0) scale(1.02)}
+  }
+  /* 2) 细格纹：只在中心一带可见，边缘渐隐，像宣纸的帘纹 */
+  .lg-grid{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(217,184,119,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(217,184,119,.055) 1px, transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(circle at 50% 46%, #000 8%, transparent 76%);
+    mask-image:radial-gradient(circle at 50% 46%, #000 8%, transparent 76%);
+  }
+  /* 3) 双环：外环刻度、内环虚线，反向慢转。法律平台的「印」不该是个
+     会转的齿轮，做成两圈静静的量度更贴题。 */
+  .lg-ring{
+    position:absolute;left:50%;top:46%;border-radius:50%;
+    transform:translate(-50%,-50%);
+  }
+  .lg-ring.r1{
+    width:min(74vw,620px);height:min(74vw,620px);
+    border:1px solid rgba(217,184,119,.14);
+    background:
+      repeating-conic-gradient(from 0deg,
+        rgba(217,184,119,.15) 0deg 0.35deg, transparent 0.35deg 6deg);
+    -webkit-mask-image:radial-gradient(circle, transparent 0 96%, #000 96% 100%);
+    mask-image:radial-gradient(circle, transparent 0 96%, #000 96% 100%);
+    animation:lg-spin 120s linear infinite;
+  }
+  .lg-ring.r2{
+    width:min(56vw,470px);height:min(56vw,470px);
+    border:1px dashed rgba(217,184,119,.13);
+    animation:lg-spin-rev 160s linear infinite;
+  }
+  @keyframes lg-spin{
+    from{transform:translate(-50%,-50%) rotate(0deg)}
+    to  {transform:translate(-50%,-50%) rotate(360deg)}
+  }
+  @keyframes lg-spin-rev{
+    from{transform:translate(-50%,-50%) rotate(360deg)}
+    to  {transform:translate(-50%,-50%) rotate(0deg)}
+  }
+  /* 4) 竖排法条文字缓慢上浮：不是装饰性弹幕，是把「条文」这件事
+     做成背景质地。opacity 压到 .1 以下，读表单时不会抢注意力。 */
+  .lg-float{
+    position:absolute;top:110%;writing-mode:vertical-rl;
+    font-family:var(--font-serif,"Songti SC",serif);
+    font-size:clamp(15px,1.5vw,21px);letter-spacing:.55em;
+    color:rgba(217,184,119,.11);white-space:nowrap;
+    animation:lg-rise 26s linear infinite;
+  }
+  @keyframes lg-rise{
+    0%  {transform:translateY(0);opacity:0}
+    12% {opacity:1}
+    88% {opacity:1}
+    100%{transform:translateY(-145vh);opacity:0}
+  }
+  /* 四角回纹：纯 CSS 的 L 形金线，比贴图更轻，也不会随背景呼吸褪色 */
+  .lg-corner{position:absolute;width:56px;height:56px;opacity:.5}
+  .lg-corner::before,.lg-corner::after{content:"";position:absolute;background:var(--lg-gold-line)}
+  .lg-corner::before{width:56px;height:1px}
+  .lg-corner::after{width:1px;height:56px}
+  .lg-corner.tl{top:26px;left:26px}
+  .lg-corner.tr{top:26px;right:26px;transform:scaleX(-1)}
+  .lg-corner.bl{bottom:26px;left:26px;transform:scaleY(-1)}
+  .lg-corner.br{bottom:26px;right:26px;transform:scale(-1,-1)}
+
+  /* ---------------------------------------------------------- 封皮卡 */
+  .lg-shell{position:relative;z-index:2;width:100%;max-width:420px;
+            animation:lg-fade-up 620ms cubic-bezier(.2,.8,.2,1) both}
+  @keyframes lg-fade-up{
+    from{opacity:0;transform:translateY(18px)}
+    to  {opacity:1;transform:translateY(0)}
+  }
+  .lg-crest{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px}
+  .lg-crest-line{height:1px;width:58px;
+    background:linear-gradient(90deg,transparent,var(--lg-gold-line))}
+  .lg-crest-line.flip{background:linear-gradient(90deg,var(--lg-gold-line),transparent)}
+  .lg-crest-seal{
+    width:36px;height:36px;border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(145deg,var(--lg-red),#9d3a33);
+    color:#fff4e6;font-family:var(--font-serif,"Songti SC",serif);
+    font-size:20px;font-weight:700;
+    box-shadow:0 6px 22px rgba(201,85,74,.42),inset 0 1px 0 rgba(255,255,255,.22);
+    animation:lg-seal 5.5s ease-in-out infinite;
+  }
+  @keyframes lg-seal{
+    0%,100%{box-shadow:0 6px 22px rgba(201,85,74,.38),inset 0 1px 0 rgba(255,255,255,.22)}
+    50%    {box-shadow:0 8px 34px rgba(224,112,95,.60),inset 0 1px 0 rgba(255,255,255,.3)}
+  }
+
+  .lg-cover{
+    position:relative;border-radius:18px;overflow:hidden;
+    background:linear-gradient(160deg,var(--lg-glass),var(--lg-glass-2));
+    border:1px solid var(--lg-line);
+    box-shadow:0 24px 70px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.07);
+    -webkit-backdrop-filter:blur(18px) saturate(1.3);
+    backdrop-filter:blur(18px) saturate(1.3);
+    padding:30px 30px 24px;
+  }
+  .lg-cover::before{
+    content:"";position:absolute;left:0;right:0;top:0;height:3px;
+    background:linear-gradient(90deg,var(--lg-red) 0 58%,var(--lg-gold) 58% 100%);
+  }
+  .lg-cover::after{
+    content:"";position:absolute;left:30px;right:30px;top:24px;height:1px;
+    background:linear-gradient(90deg,var(--lg-gold-line),transparent);opacity:.6;
+  }
+
+  h1.lg-h1{
+    margin:8px 0 7px;text-align:center;
+    font-family:var(--font-serif,"Songti SC",serif);
+    font-size:1.5rem;font-weight:700;letter-spacing:.1em;line-height:1.35;
+    background:linear-gradient(100deg,#fff6e6 10%,var(--lg-gold) 52%,#f6e7c8 90%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lg-sub{
+    margin:0 0 22px;text-align:center;min-height:18px;
+    font-size:.73rem;color:var(--lg-dim);line-height:1.7;
+    font-variant-numeric:tabular-nums;
+  }
+  .lg-sub.seed{color:#e8bb72}
+  .lg-sub .lg-note{display:block;opacity:.82;font-size:.68rem}
+
+  /* 身份分段：两枚按钮 + 一颗会滑的胶囊。管理员态只是**入口收窄**，
+     服务端 /api/auth/register 本来就写死 role=user，这里不另做权限判断。 */
+  .lg-roles{
+    position:relative;display:flex;gap:0;margin:0 0 10px;padding:4px;
+    border-radius:11px;background:rgba(0,0,0,.28);
+    border:1px solid var(--lg-line);
+  }
+  .lg-glider{
+    position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);
+    border-radius:8px;
+    background:linear-gradient(135deg,rgba(201,85,74,.92),rgba(160,60,52,.92));
+    box-shadow:0 3px 12px rgba(201,85,74,.35),inset 0 1px 0 rgba(255,255,255,.2);
+    transition:transform 320ms cubic-bezier(.2,.8,.2,1);
+  }
+  .lg-roles.admin .lg-glider{transform:translateX(100%)}
+  .lg-role{
+    position:relative;z-index:1;flex:1;min-height:38px;
+    border:0;background:transparent;color:var(--lg-dim);
+    font-family:inherit;font-size:.82rem;font-weight:500;letter-spacing:.05em;
+    cursor:pointer;transition:color 240ms ease;
+  }
+  .lg-role.on{color:#fff6ea;font-weight:600}
+  .lg-role:focus-visible{outline:2px solid var(--lg-gold);outline-offset:-2px;border-radius:8px}
+  .lg-role-note{
+    margin:0 0 18px;text-align:center;font-size:.68rem;color:var(--lg-dim);
+    min-height:16px;line-height:1.6;
+  }
+
+  .lg-tabs{display:flex;gap:24px;border-bottom:1px solid var(--lg-line);margin-bottom:18px}
+  .lg-tab{
+    position:relative;background:none;border:0;font-family:inherit;
+    color:var(--lg-dim);cursor:pointer;min-height:42px;padding:0 2px;
+    font-size:.86rem;font-weight:500;letter-spacing:.04em;
+    transition:color 220ms ease;
+  }
+  .lg-tab::after{
+    content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+    background:linear-gradient(90deg,var(--lg-red),var(--lg-gold));
+    transform:scaleX(0);transform-origin:left;
+    transition:transform 260ms cubic-bezier(.2,.8,.2,1);
+  }
+  .lg-tab.active{color:var(--lg-text)}
+  .lg-tab.active::after{transform:scaleX(1)}
+  .lg-tab:hover{color:var(--lg-gold)}
+  .lg-tab[hidden]{display:none}
+
+  .lg-cover label{
+    display:block;font-size:.73rem;color:var(--lg-dim);
+    margin:13px 0 6px;letter-spacing:.03em;
+  }
+  .lg-cover .field{
+    width:100%;box-sizing:border-box;padding:12px 14px;
+    background:rgba(0,0,0,.26);color:var(--lg-text);
+    border:1px solid var(--lg-line);border-radius:9px;
+    font-family:inherit;font-size:.9rem;line-height:1.5;
+    transition:border-color 220ms ease,box-shadow 220ms ease,background 220ms ease;
+  }
+  .lg-cover .field::placeholder{color:rgba(167,162,148,.55)}
+  .lg-cover .field:focus{
+    outline:none;border-color:rgba(217,184,119,.65);
+    background:rgba(0,0,0,.36);
+    box-shadow:0 0 0 3px rgba(217,184,119,.12);
+  }
+  .lg-hint{font-size:.68rem;color:var(--lg-dim);margin-top:7px;line-height:1.6}
+  .lg-cover #reg-only[hidden]{display:none}
+
+  .lg-cover .submit{
+    width:100%;margin-top:22px;min-height:48px;box-sizing:border-box;
+    border:0;border-radius:10px;cursor:pointer;
+    font-family:inherit;font-size:.94rem;font-weight:600;letter-spacing:.08em;
+    color:#fff5e8;
+    background:linear-gradient(105deg,#a83f37 0%,var(--lg-red) 45%,#b98248 100%);
+    box-shadow:0 10px 26px rgba(201,85,74,.28);
+    position:relative;overflow:hidden;
+    transition:transform 200ms ease,box-shadow 200ms ease,filter 200ms ease;
+  }
+  .lg-cover .submit:hover:not(:disabled){transform:translateY(-2px);
+    box-shadow:0 14px 32px rgba(201,85,74,.4);filter:brightness(1.06)}
+  .lg-cover .submit:disabled{opacity:.6;cursor:default}
+  .lg-cover .submit::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(100deg,transparent 22%,rgba(255,255,255,.24) 50%,transparent 78%);
+    transform:translateX(-110%);
+  }
+  .lg-cover .submit:hover:not(:disabled)::after{animation:lg-sweep 720ms ease}
+  @keyframes lg-sweep{to{transform:translateX(110%)}}
+
+  .lg-msg{
+    margin-top:13px;font-size:.8rem;min-height:20px;line-height:1.55;text-align:center;
+  }
+  .lg-msg.bad{color:#f0a49a}
+  .lg-msg.ok{color:#a9dcb7}
+  .lg-foot{
+    margin-top:16px;padding-top:13px;border-top:1px solid var(--lg-line);
+    font-size:.69rem;color:var(--lg-dim);text-align:center;line-height:1.7;
+  }
+  .lg-foot b{color:var(--lg-gold);font-weight:600}
+  .lg-meta{
+    margin-top:18px;text-align:center;font-size:.66rem;color:rgba(167,162,148,.66);
+    line-height:1.8;
+  }
+  .lg-meta kbd{
+    font-family:var(--font-mono,monospace);font-size:.66rem;
+    border:1px solid var(--lg-line);border-radius:4px;padding:0 5px;
+  }
+
+  @media (max-width:520px){
+    .lg-cover{padding:26px 20px 20px}
+    .lg-cover::after{left:20px;right:20px}
+    h1.lg-h1{font-size:1.28rem}
+    .lg-corner{width:34px;height:34px}
+    .lg-corner::before{width:34px}
+    .lg-corner::after{height:34px}
+  }
+  /* 系统开了「减少动态效果」：所有循环动画一次关干净，只留静态构图。
+     背景色定在起始帧，不会停在某个随机的中间亮度上。 */
+  @media (prefers-reduced-motion:reduce){
+    body.login-page{animation:none;background-color:#0b0e14}
+    .lg-aurora,.lg-ring,.lg-float,.lg-crest-seal,.lg-shell{animation:none}
+    .lg-cover .submit:hover:not(:disabled)::after{animation:none}
+    .lg-glider{transition:none}
+  }
+</style>
+</head>
+<body class="login-page">
+
+<div class="lg-bg" aria-hidden="true">
+  <div class="lg-aurora"></div>
+  <div class="lg-grid"></div>
+  <div class="lg-ring r1"></div>
+  <div class="lg-ring r2"></div>
+  <div class="lg-corner tl"></div><div class="lg-corner tr"></div>
+  <div class="lg-corner bl"></div><div class="lg-corner br"></div>
+  <span class="lg-float" style="left:7%;animation-delay:0s">依法明断　持衡守正</span>
+  <span class="lg-float" style="left:19%;animation-delay:-6s">条分缕析　有据可循</span>
+  <span class="lg-float" style="left:83%;animation-delay:-11s">援引必核　存疑则阙</span>
+  <span class="lg-float" style="left:93%;animation-delay:-17s">现行有效　逐句溯源</span>
+</div>
+
+<div class="lg-shell">
+  <div class="lg-crest">
+    <div class="lg-crest-line"></div>
+    <div class="lg-crest-seal">法</div>
+    <div class="lg-crest-line flip"></div>
+  </div>
+
+  <div class="lg-cover">
+    <h1 class="lg-h1">多领域法规问答</h1>
+    <p class="lg-sub" id="stat">&nbsp;</p>
+
+    <div class="lg-roles" id="roles" role="group" aria-label="选择登录身份">
+      <span class="lg-glider" aria-hidden="true"></span>
+      <button class="lg-role on" id="role-user" data-role="user" type="button"
+              aria-pressed="true">用户</button>
+      <button class="lg-role" id="role-admin" data-role="admin" type="button"
+              aria-pressed="false">管理员</button>
+    </div>
+    <p class="lg-role-note" id="role-note">用户可自助注册账号并提问。</p>
+
+    <div class="lg-tabs" id="tabs">
+      <button class="lg-tab active" id="tab-login" data-mode="login" type="button">登录</button>
+      <button class="lg-tab" id="tab-reg" data-mode="register" type="button" hidden>注册</button>
+    </div>
+
+    <form id="form" autocomplete="on">
+      <label for="username">用户名</label>
+      <input class="field" id="username" autocomplete="username" required
+             placeholder="中文或英文均可">
+
+      <label for="password">密码</label>
+      <input class="field" id="password" type="password" autocomplete="current-password"
+             required placeholder="••••••••">
+
+      <div id="reg-only" hidden>
+        <label for="password2">确认密码</label>
+        <input class="field" id="password2" type="password" autocomplete="new-password"
+               placeholder="再输一次">
+        <div class="lg-hint">至少 8 位，需同时包含字母和数字</div>
+      </div>
+
+      <button class="btn submit" id="go" type="submit">登录</button>
+    </form>
+
+    <div class="lg-msg" id="msg"></div>
+    <div class="lg-foot" id="foot"></div>
+  </div>
+
+  <div class="lg-meta" id="meta-line">
+    按 <kbd>?</kbd> 查看快捷键 · <kbd>Ctrl J</kbd> 切换日夜读 · 深浅配色自动流转
+  </div>
+</div>
+
+<script src="/assets/ui.js?v=131"></script>
+<script>
+var $ = function (id) { return document.getElementById(id); };
+var mode = 'login';        // login | register
+var role = 'user';         // user | admin —— 只是入口形态，不是权限判定
+var allowRegister = false;
+var msg = $('msg');
+
+function say(text, cls) {
+  msg.textContent = text || '';
+  msg.className = 'lg-msg' + (cls ? ' ' + cls : '');
+}
+
+/* 身份切换：管理员态不提供注册、也不显示「自己开一个」。
+   服务端 /api/auth/register 恒以 role="user" 建号，管理员只能由
+   make_admin.py / 启动引导开通，所以这里收窄的是 UI 而非权限边界。 */
+function setRole(r) {
+  role = (r === 'admin') ? 'admin' : 'user';
+  var admin = (role === 'admin');
+  $('roles').classList.toggle('admin', admin);
+  ['role-user', 'role-admin'].forEach(function (id) {
+    var on = ($(id).dataset.role === role);
+    $(id).classList.toggle('on', on);
+    $(id).setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  $('role-note').textContent = admin
+    ? '管理员账号由系统开通，不开放自助注册。'
+    : '用户可自助注册账号并提问。';
+  $('tab-reg').hidden = admin || !allowRegister;
+  if (admin) setMode('login');
+  refreshFoot();          /* 两种身份都要刷：管理员态才不会留着「自己开一个」*/
+  say('');
+}
+
+function refreshFoot() {
+  if (role === 'admin') {
+    $('foot').textContent = '请用管理员账号登录；没有账号请联系系统维护人。';
+  } else if (allowRegister) {
+    $('foot').innerHTML = '没有账号？点上面的<b>注册</b>自己开一个。';
+  } else {
+    $('foot').textContent = '本站未开放注册，账号请联系管理员开通。';
+  }
+}
+
+function setMode(m) {
+  mode = m;
+  var reg = (m === 'register');
+  Array.prototype.forEach.call(document.querySelectorAll('.lg-tab'), function (t) {
+    t.classList.toggle('active', t.dataset.mode === m);
+  });
+  $('reg-only').hidden = !reg;
+  $('go').textContent = reg ? '注册并登录' : '登录';
+  $('password').autocomplete = reg ? 'new-password' : 'current-password';
+  say('');
+  if (reg) $('password2').focus();
+}
+
+Array.prototype.forEach.call(document.querySelectorAll('.lg-role'), function (b) {
+  b.onclick = function () { setRole(b.dataset.role); };
+});
+Array.prototype.forEach.call(document.querySelectorAll('.lg-tab'), function (t) {
+  t.onclick = function () { setMode(t.dataset.mode); };
+});
+
+// 从对话页「改密码」跳回来时会带 ?changed=1。不提示一句，用户会以为
+// 自己被踢出来了——刚改完密码就看到登录框，直觉上像出了问题。
+if (location.search.indexOf('changed=1') >= 0) {
+  say('密码已更新，请用新密码登录', 'ok');
+  $('username').focus();
+}
+
+// v127：正常态不再报「已收录 2066 条条文 · 9 部法律 · LLM 就绪（未调用）」。
+// 这行原本想让第一次来的人判断值不值得注册，实际效果是在登录页先摆一串
+// 技术参数——用户不关心，也看不懂「未调用」是什么意思；规模该由内容证明，
+// 不该自己喊。留一个不换行空格占位，是为了卡片高度不跳。
+// 只有两种异常必须说：语料是示例（看到的东西不能当真）、模型不可用
+// （回答会降级成回放）。这两种不说，用户会以为系统坏了或者被骗了。
+fetch('/api/meta').then(function (r) { return r.json(); }).then(function (m) {
+  var st = $('stat');
+  st.textContent = '\u00A0';
+  st.classList.remove('seed');
+  /* 运行模式照旧算。种子语料时必须跟在告警后面：这两件事常常一起来
+     （同一台机器、同一批没配好的东西），只报「17 条」会让人以为只是少，
+     而不知道同时在回放。 */
+  var tail = m.mode;
+  if (m.llm_live === 'error') {
+    tail = (m.llm_live_note || '模型不可用') + '，回放中';
+  } else if (m.llm_live === 'idle') {
+    tail = 'LLM 就绪（未调用）';
+  }
+  if (m.corpus_seed) {
+    st.textContent = '⚠ 只有 ' + m.articles + ' 条示例语料 · 正式语料未导入 · ' + tail;
+    st.classList.add('seed');
+  } else if (m.llm_live === 'error') {
+    st.textContent = '⚠ ' + tail;
+    st.classList.add('seed');
+  }
+  allowRegister = !!m.allow_register;
+  setRole(role);
+}).catch(function () {
+  $('stat').textContent = '（无法读取服务状态）';
+  setRole(role);
+});
+
+$('form').onsubmit = async function (e) {
+  e.preventDefault();
+  var username = $('username').value.trim();
+  var password = $('password').value;
+  if (!username || !password) { say('用户名和密码都要填', 'bad'); return; }
+
+  if (mode === 'register') {
+    if (role === 'admin') { say('管理员账号不开放自助注册', 'bad'); return; }
+    if (password.length < 8) { say('密码至少 8 位', 'bad'); return; }
+    if (!/[0-9]/.test(password) || !/[a-zA-Z]/.test(password)) {
+      say('密码要同时包含字母和数字', 'bad'); return;
+    }
+    if (password !== $('password2').value) { say('两次输入的密码不一致', 'bad'); return; }
+  }
+
+  var go = $('go');
+  go.disabled = true;
+  say(mode === 'register' ? '正在创建账号…' : '正在登录…');
+  try {
+    var res = await fetch('/api/auth/' + mode, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username, password: password })
+    });
+    var d = await res.json().catch(function () { return {}; });
+    if (!res.ok) { say(d.error || ('请求失败（HTTP ' + res.status + '）'), 'bad'); return; }
+    /* 选了「管理员」身份却登进普通账号：不阻断（账号本身是合法的），
+       但要说清楚，否则用户会带着「我在后台管理态」的错觉进主界面，
+       找不到后台入口还以为功能坏了。服务端 /admin 另有角色校验兜底。 */
+    if (role === 'admin' && !(d.user && d.user.role === 'admin')) {
+      say('这个账号是普通用户，不是管理员；已按普通身份进入。', 'bad');
+    } else {
+      say('成功，正在进入…', 'ok');
+    }
+    location.href = '/';
+  } catch (err) {
+    say('网络错误：' + err, 'bad');
+  } finally {
+    go.disabled = false;
+  }
+};
+
+$('username').focus();
+</script>
+</body>
+</html>

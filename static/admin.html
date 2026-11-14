@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>管理员后台 · 多领域法规问答</title>
+<!-- v131：首帧前钉死配色，只读 localStorage，不看系统。见 index.html 同段注释。 -->
+<script>try{var _t=localStorage.getItem('law.theme');
+document.documentElement.setAttribute('data-theme',_t==='dark'?'dark':'light');}catch(e){}</script>
+<link rel="stylesheet" href="/assets/theme.css?v=131">
+<style>
+  /* 配色全部来自 theme.css。这里只留后台专属的布局与组件。 */
+  :root{--aside:rgba(239,231,214,.6)}
+  html[data-theme="dark"]{--aside:rgba(28,23,18,.55)}
+  a{color:var(--accent);text-decoration:none}
+  button{font-family:inherit;font-size:.8125rem;cursor:pointer}
+  .app{display:grid;grid-template-columns:212px 1fr;min-height:100vh}
+
+  /* ---------- 侧栏 ---------- */
+  aside{background:var(--aside);border-right:1px solid var(--line);
+        display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+        -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .brand{
+    padding:22px 18px 16px;font-family:var(--font-serif);
+    font-size:1rem;font-weight:700;line-height:1.4;letter-spacing:.04em;
+    position:relative;
+  }
+  .brand::after{
+    content:"";position:absolute;left:18px;right:18px;bottom:0;height:1px;
+    background:linear-gradient(90deg,var(--accent),var(--gold-line),transparent);
+  }
+  .brand span{
+    display:block;font-family:var(--font-ui);font-size:.6875rem;
+    color:var(--dim);font-weight:400;letter-spacing:.08em;margin-top:3px;
+  }
+  nav{padding:10px 10px;flex:1;overflow:auto}
+  nav button{
+    position:relative;display:block;width:100%;text-align:left;
+    background:none;border:0;color:var(--dim);
+    min-height:40px;padding:9px 12px;border-radius:var(--r-sm);
+    margin-bottom:3px;font-size:.8125rem;
+    transition:background-color var(--dur) var(--ease), color var(--dur) var(--ease),
+               transform var(--dur) var(--ease), padding-left var(--dur) var(--ease);
+  }
+  /* 悬停往右挪 2px、左边长出一道金条——比单纯换底色更有「翻到这一页」的感觉 */
+  nav button::before{
+    content:"";position:absolute;left:0;top:50%;width:3px;height:0;
+    background:var(--gold);border-radius:0 3px 3px 0;
+    transform:translateY(-50%);
+    transition:height var(--dur) var(--ease);
+  }
+  nav button:hover{background:var(--sunk);color:var(--text);transform:translateX(2px)}
+  nav button:hover::before{height:14px}
+  nav button.active{
+    background:var(--accent-soft);color:var(--accent);font-weight:600;
+    padding-left:16px;
+  }
+  nav button.active::before{height:22px;background:var(--accent)}
+  nav button em{float:right;font-style:normal;font-size:.6875rem;color:var(--dim)}
+
+  /* 侧栏底部：账号 + 显示设置 + 两个动作 */
+  .me{border-top:1px solid var(--line);padding:12px 14px 14px;font-size:.75rem}
+  .me b{display:block;font-weight:600;margin-bottom:8px;word-break:break-all}
+  .me-row{display:flex;gap:6px;margin-bottom:8px}
+  .me button{
+    background:none;border:1px solid var(--line);color:var(--dim);
+    border-radius:var(--r-sm);min-height:34px;padding:0 10px;font-size:.75rem;
+    flex:1;
+    transition:all var(--dur) var(--ease);
+  }
+  .me button:hover{color:var(--accent);border-color:var(--accent);
+                   background:var(--accent-soft);transform:translateY(-1px) scale(1.02)}
+  .me .icon-btn{flex:0 0 auto;width:34px;height:34px;font-size:.875rem}
+  .me .icon-btn:hover{transform:scale(1.12)}
+
+  /* ---------- 主区 ---------- */
+  main{padding:26px 30px 60px;min-width:0}
+  h2{
+    font-family:var(--font-serif);font-size:1.125rem;font-weight:700;
+    margin:0 0 4px;letter-spacing:.04em;
+  }
+  .lead{font-size:.78125rem;color:var(--dim);margin:0 0 20px;line-height:1.75}
+
+  /* 面板切换：淡入 + 轻微上浮。只在切换时播一次，不做持续动画 */
+  @keyframes panel-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  main > section{animation:panel-in 280ms var(--ease-out) both}
+  main > section[hidden]{display:none}
+
+  /* 告警条：比普通卡片更靠上、更窄，扫一眼就知道要不要继续往下看 */
+  #ov-alerts{margin-bottom:14px}
+  .alert{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:11px 14px;margin-bottom:8px;border-radius:var(--r-sm);
+    border:1px solid var(--line);border-left-width:3px;
+    background:var(--panel);font-size:.8125rem;line-height:1.6;
+    animation:fade-up 260ms var(--ease-out) both;
+  }
+  .alert .ic{
+    flex:0 0 auto;width:20px;height:20px;border-radius:50%;
+    font-size:.6875rem;font-weight:700;line-height:20px;text-align:center;
+    margin-top:1px;
+  }
+  .alert b{display:block;font-weight:600;margin-bottom:2px}
+  .alert .d{color:var(--dim);font-size:.75rem}
+  .alert.warn{border-left-color:var(--warn);background:var(--warn-bg)}
+  .alert.warn .ic{background:var(--warn);color:#fff}
+  .alert.bad{border-left-color:var(--bad);background:var(--bad-bg)}
+  .alert.bad .ic{background:var(--bad);color:#fff}
+  .alert.info{border-left-color:var(--mem);background:var(--mem-bg)}
+  .alert.info .ic{background:var(--mem);color:#fff}
+  .alert.clean{border-left-color:var(--ok);background:var(--ok-bg);
+               color:var(--dim);padding:8px 12px}
+  .alert.clean .ic{background:var(--ok);color:#fff;width:16px;height:16px;
+                   line-height:16px;font-size:.625rem}
+
+  /* 反馈列表。差评是这个后台里唯一「用户亲口说的不满意」，
+     所以每条都要能点进原会话——只看一句「没用」是没法改的。 */
+  .fbrow{
+    padding:9px 0;border-top:1px solid var(--line);
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .fbrow:first-of-type{border-top:0}
+  .fbrow .q{font-size:.8125rem;color:var(--text)}
+  .fbrow .q::before{content:"× ";color:var(--bad)}
+  .fbrow .a{font-size:.75rem;color:var(--dim);line-height:1.7}
+  .fbrow .text-btn{align-self:flex-start;font-size:.75rem;padding:2px 0}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+    padding:15px 17px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow-1);
+    transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+               border-color var(--dur) var(--ease);
+  }
+  /* 卡片悬停时顶部亮一道金线——数据卡片不是按钮，放大要克制 */
+  .card::before{
+    content:"";position:absolute;left:0;top:0;height:2px;width:0;
+    background:linear-gradient(90deg,var(--accent),var(--gold));
+    transition:width var(--dur-slow) var(--ease-out);
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2);border-color:var(--line-2)}
+  .card:hover::before{width:100%}
+  .card .k{font-size:.71875rem;color:var(--dim);margin-bottom:6px;letter-spacing:.02em}
+  .card .n{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+  .card .s{font-size:.71875rem;color:var(--dim);margin-top:5px}
+  .card.bad .n{color:var(--bad)} .card.warn .n{color:var(--warn)}
+  .card.ok .n{color:var(--ok)}
+
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+       padding:17px 19px;margin-top:18px;box-shadow:var(--shadow-1)}
+  .box h3{
+    font-size:.78125rem;font-weight:600;margin:0 0 14px;color:var(--dim);
+    letter-spacing:.06em;
+  }
+
+  /* 柱状图：纯 div，不引图表库 —— 七天提问量不值得多一个依赖 */
+  .chart{display:flex;align-items:stretch;gap:10px;height:140px}
+  .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;
+       align-items:center;gap:6px;min-width:0}
+  /* 柱体要单独占一块**有确定高度**的区域。第一版把 height:100% 直接挂在
+     .bar 上，而 .bar 高度是 auto，百分比高度全程失效，柱子永远塌成一条线。
+     这类错误页面不报错、只在有数据时才看得出来。 */
+  .bar .slot{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+  .bar .col{width:100%;max-width:46px;background:var(--line-2);border-radius:4px 4px 0 0;
+            min-height:2px;transition:height .3s}
+  .bar .col.has{background:var(--accent)}
+  .bar .v{font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .bar .d{font-size:10.5px;color:var(--dim);white-space:nowrap}
+
+  /* ---------- 工具条与表格 ---------- */
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .tools input,.tools select{background:var(--sunk);border:1px solid var(--line);
+        color:var(--text);border-radius:7px;padding:7px 11px;font:inherit;font-size:13px;outline:none}
+  .tools input{flex:1;min-width:150px;max-width:280px}
+  /* theme.css 给所有 select 设了 width:100%，工具条里要收回来自适应 */
+  .tools select{width:auto;flex:0 0 auto;min-width:140px}
+  .tools input:focus,.tools select:focus{border-color:var(--gold)}
+  .tools .sp{flex:1}
+  /* 后台按钮比对话页克制一档：主操作 40px，表格内小操作 28px。
+     44px 在密集表格里会把行高撑开，反而更难扫读。 */
+  .btn{min-height:40px;padding:0 18px;border-radius:var(--r-sm);
+       font-size:.8125rem;font-weight:600}
+  .btn.ghost{background:none;border:1px solid var(--line-2);color:var(--text);font-weight:400}
+  .btn.ghost:hover{border-color:var(--gold);background:var(--gold-soft)}
+  .btn.mini{min-height:28px;padding:0 10px;font-size:.75rem;border-radius:6px}
+  .btn.mini:hover{transform:translateY(-1px) scale(1.04)}
+  .btn.danger{background:none;border:1px solid var(--bad);color:var(--bad)}
+  .btn.danger:hover{background:var(--bad-bg);transform:translateY(-1px) scale(1.03)}
+
+  table{width:100%;border-collapse:collapse;font-size:.8125rem}
+  th{text-align:left;font-weight:500;color:var(--dim);font-size:.71875rem;
+     letter-spacing:.06em;padding:0 10px 9px;border-bottom:1px solid var(--line-2);
+     white-space:nowrap}
+  td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+  tbody tr{transition:background-color var(--dur) var(--ease)}
+  tbody tr:hover td{background:var(--sunk)}
+  /* 悬停行左侧亮一道金条，眼睛在长表格里不会跟丢 */
+  tbody tr td:first-child{box-shadow:inset 2px 0 0 transparent;
+                          transition:box-shadow var(--dur) var(--ease)}
+  tbody tr:hover td:first-child{box-shadow:inset 2px 0 0 var(--gold)}
+  td.num{font-variant-numeric:tabular-nums;color:var(--dim);white-space:nowrap}
+  td.title{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tag{display:inline-block;font-size:.6875rem;border:1px solid var(--line-2);
+       border-radius:var(--r-pill);padding:0 9px;color:var(--dim);white-space:nowrap;
+       transition:all var(--dur) var(--ease)}
+  .tag.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+  .tag.bad{color:var(--bad);border-color:var(--bad);background:var(--bad-bg)}
+  .tag.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-bg)}
+  .tag.adm{color:var(--mem);border-color:var(--mem);background:var(--mem-bg)}
+  .acts{display:flex;gap:5px;flex-wrap:wrap}
+  .pager{display:flex;gap:10px;align-items:center;justify-content:flex-end;
+         margin-top:12px;font-size:.75rem;color:var(--dim)}
+  .empty{padding:30px;text-align:center;color:var(--dim);font-size:.8125rem;line-height:1.9}
+
+  /* ---------- 模态 ---------- */
+  @keyframes sheet-in{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+  .modal{position:fixed;inset:0;background:var(--veil);display:flex;
+         align-items:center;justify-content:center;padding:24px;z-index:50;
+         animation:fade-in 180ms var(--ease) both;
+         -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .modal[hidden]{display:none}
+  .sheet{background:var(--panel);border:1px solid var(--line-2);border-radius:var(--r-lg);
+         width:100%;max-width:760px;max-height:86vh;display:flex;flex-direction:column;
+         box-shadow:var(--shadow-3);animation:sheet-in 240ms var(--ease-out) both;
+         position:relative;overflow:hidden}
+  .sheet::before{
+    content:"";position:absolute;left:0;right:0;top:0;height:3px;z-index:1;
+    background:linear-gradient(90deg,var(--accent),var(--gold));
+  }
+  .sheet header{display:flex;align-items:center;gap:12px;padding:16px 20px 14px;
+                border-bottom:1px solid var(--line)}
+  .sheet header h3{
+    font-family:var(--font-serif);font-size:1rem;font-weight:700;
+    letter-spacing:.03em;margin:0;flex:1;
+  }
+  .sheet header button{
+    width:32px;height:32px;background:none;border:0;color:var(--dim);
+    font-size:1.125rem;line-height:1;border-radius:var(--r-sm);
+    transition:all var(--dur) var(--ease);
+  }
+  .sheet header button:hover{background:var(--accent-soft);color:var(--accent);
+                             transform:scale(1.12)}
+  .sheet .body{padding:18px 20px;overflow:auto;flex:1}
+  /* 档案只读视图。用两列网格而不是表格：字段名长短差很多
+     （「电话」到「统一社会信用代码」），表格列宽会被最长那个撑开。 */
+  .pf-grid{display:grid;grid-template-columns:auto 1fr;gap:9px 16px;
+           margin:12px 0 4px;align-items:baseline}
+  .pf-k{font-size:.75rem;color:var(--dim);white-space:nowrap}
+  .pf-v{font-size:.8125rem;color:var(--text);word-break:break-word}
+  .pf-v.miss{color:var(--dim);opacity:.7}
+  .pf-meta{font-size:.75rem;color:var(--dim);line-height:1.8;
+           margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
+           white-space:pre-line}
+  .sheet footer{padding:14px 20px;border-top:1px solid var(--line);
+                display:flex;gap:8px;justify-content:flex-end}
+  .sheet footer button{background:none;border:1px solid var(--line-2);color:var(--text);
+                       border-radius:var(--r-sm);min-height:36px;padding:0 18px;
+                       transition:all var(--dur) var(--ease)}
+  .sheet footer button:hover{background:var(--sunk);transform:translateY(-1px)}
+  .sheet footer button.primary{background:var(--accent);border:0;color:var(--accent-ink);
+     font-weight:600}
+  .sheet footer button.primary:hover{background:var(--accent-h);
+     transform:translateY(-1px) scale(1.02)}
+  .sheet label{display:block;font-size:.75rem;color:var(--dim);margin:13px 0 6px}
+  .sheet label:first-child{margin-top:0}
+  .sheet input,.sheet select,.sheet textarea{width:100%;background:var(--sunk);
+        border:1px solid var(--line);color:var(--text);border-radius:var(--r-sm);
+        padding:9px 11px;font:inherit;font-size:.8125rem;outline:none}
+  .sheet .tip{font-size:.71875rem;color:var(--dim);margin-top:6px;line-height:1.7}
+
+  .msg-row{margin-bottom:14px;animation:fade-up 240ms var(--ease-out) both}
+  .msg-row .who{font-size:.71875rem;margin-bottom:5px;letter-spacing:.04em}
+  .msg-row.user .who{color:var(--accent)}
+  .msg-row.assistant .who{color:var(--ok)}
+  .msg-row .txt{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--line);
+                border-radius:var(--r-sm);padding:12px 14px;font-size:.8125rem;
+                line-height:1.85;word-break:break-word}
+  .kv{display:flex;gap:8px;flex-wrap:wrap;font-size:.75rem;color:var(--dim);margin-bottom:14px}
+  .kv span{border:1px solid var(--line-2);border-radius:var(--r-pill);padding:1px 9px}
+
+  /* toast 用 theme.css 的同一套（.law-toast），这里只兜住旧调用点 */
+  #toast{position:fixed;right:22px;bottom:22px;display:flex;flex-direction:column;
+         gap:8px;z-index:180}
+  #toast div{
+    background:var(--text);color:var(--bg);border:0;border-radius:var(--r-pill);
+    padding:10px 16px;font-size:.8125rem;max-width:340px;
+    box-shadow:var(--shadow-2);animation:fade-up 220ms var(--ease-out) both;
+  }
+  #toast div.bad{background:var(--bad);color:#fff}
+  html[data-theme="dark"] #toast div{background:var(--gold);color:#231704}
+  html[data-theme="dark"] #toast div.bad{background:var(--bad);color:#2a0b09}
+  /* ---------- v146 窄屏 ----------
+     后台原来只有一套「212px 侧栏 + 主区」的桌面布局：390 宽时侧栏吃掉一半，
+     主区剩 178，卡片（minmax 168）和六列表格全被裁在右缘外（截图实测）。
+     后台是另一套界面、只有管理员能进，但「手机上打开是坏的」一样算坏。
+     窄屏改成：侧栏压成顶栏（品牌 + 横滑导航 + 账号）＋ 主区通栏；
+     表格自己横向滚，不把整页撑宽。 */
+  @media (max-width:760px){
+    .app{grid-template-columns:1fr}
+    /* grid/flex 子项默认 min-width:auto：横滑条里那五个 nowrap 按钮会把
+       aside 的 min-content 撑到 402（比 390 还宽 12，整页横向滚）。
+       显式给 0，让 nav 自己去滚。 */
+    aside{position:static;height:auto;border-right:0;min-width:0;
+          border-bottom:1px solid var(--line)}
+    .brand{padding:14px 14px 12px}
+    .brand::after{left:14px;right:14px}
+    nav{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;
+        overflow-y:hidden;scrollbar-width:none}
+    nav::-webkit-scrollbar{display:none}
+    nav button{flex:0 0 auto;width:auto;white-space:nowrap;margin:0;
+               min-height:36px;padding:8px 12px}
+    nav button.active{padding-left:12px}
+    nav button::before{display:none}
+    nav button:hover{transform:none}
+    .me{padding:8px 14px 12px;display:flex;flex-wrap:wrap;gap:8px;
+        align-items:center}
+    .me b{margin:0;width:100%}
+    .me-row{margin:0}
+    main{padding:18px 16px 40px}
+    .cards{grid-template-columns:repeat(2,1fr)}
+    /* 六列表格塞不进 390：让表格自己滚，别把整页撑出横向滚动条。
+       单元格也不许折行——不然「ui-first-run」断成两截、日期只在右缘露
+       半个「2026-11-14 1」，读起来像被裁掉（截图实测）。宁可靠横滑看全。 */
+    main table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    main th,main td{white-space:nowrap}
+    td.title{max-width:240px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">多领域法规 Agent<span>管理员后台 · 只读审计</span></div>
+    <nav id="nav">
+      <button data-view="overview" class="active">概览</button>
+      <button data-view="users">用户管理</button>
+      <button data-view="sessions">会话审计</button>
+      <button data-view="logins">登录日志</button>
+      <button data-view="audits">操作审计</button>
+    </nav>
+    <div class="me">
+      <b id="me-name">…</b>
+      <div class="me-row">
+        <button class="icon-btn" data-theme-icon type="button" title="切换配色" aria-label="切换配色">☾</button>
+        <button class="icon-btn" data-fs-btn type="button" title="切换字号" aria-label="切换字号"
+                style="font-weight:700">A+</button>
+        <button class="icon-btn" data-help-btn type="button" title="快捷键" aria-label="快捷键">?</button>
+      </div>
+      <div class="me-row">
+        <button id="go-chat" type="button">返回对话</button>
+        <button id="logout" type="button">退出</button>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <section id="v-overview">
+      <h2>概览</h2>
+      <p class="lead" id="ov-lead">&nbsp;</p>
+      <div id="ov-alerts"></div>
+      <div class="cards" id="ov-cards"></div>
+      <div class="box">
+        <h3>最近 7 天提问量</h3>
+        <div class="chart" id="ov-chart"></div>
+      </div>
+      <div class="box">
+        <h3>最近拒答</h3>
+        <div id="ov-refused"></div>
+      </div>
+      <div class="box">
+        <h3>用户反馈</h3>
+        <p class="lead">只有看过真实提问的人点过才有数——这是目前唯一不靠自造题集的信号。</p>
+        <div id="ov-feedback"></div>
+      </div>
+    </section>
+
+    <section id="v-users" hidden>
+      <h2>用户管理</h2>
+      <p class="lead">停用会立刻让该用户手上的登录状态失效；最后一个管理员不能停用或降级。</p>
+      <div class="tools">
+        <input id="u-q" placeholder="搜索用户名">
+        <select id="u-role">
+          <option value="">全部角色</option>
+          <option value="user">普通用户</option>
+          <option value="admin">管理员</option>
+        </select>
+        <select id="u-status">
+          <option value="">全部状态</option>
+          <option value="active">正常</option>
+          <option value="banned">已停用</option>
+        </select>
+        <span class="sp"></span>
+        <button class="btn" id="u-new">新建账号</button>
+      </div>
+      <div class="box" style="padding:14px 16px 10px"><div id="u-table"></div></div>
+      <div class="pager" id="u-pager"></div>
+    </section>
+
+    <section id="v-sessions" hidden>
+      <h2>会话审计</h2>
+      <p class="lead">点「查看正文」会写明谁在什么时候看过——这一步才是「可看但留痕」的落点。</p>
+      <div class="tools">
+        <input id="s-q" placeholder="搜索用户名、会话 ID 或提问内容">
+        <select id="s-owner" title="按归属筛选">
+          <option value="owned" selected>仅已归属</option>
+          <option value="any">全部会话</option>
+          <option value="orphan">仅无主（v20 前遗留）</option>
+        </select>
+        <span class="sp"></span>
+        <span class="tag" id="s-total"></span>
+      </div>
+      <div class="box" style="padding:14px 16px 10px"><div id="s-table"></div></div>
+      <div class="pager" id="s-pager"></div>
+    </section>
+
+    <section id="v-logins" hidden>
+      <h2>登录日志</h2>
+      <p class="lead">失败原因区分「没这个人 / 密码错 / 锁定 / 撞库限流」，对外统一只报「用户名或密码不正确」。</p>
+      <div class="box" style="padding:14px 16px 10px"><div id="l-table"></div></div>
+    </section>
+
+    <section id="v-audits" hidden>
+      <h2>操作审计</h2>
+      <p class="lead">管理员对账号的每一次改动，以及每一次打开会话正文。</p>
+      <div class="box" style="padding:14px 16px 10px"><div id="a-table"></div></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet">
+    <header><h3 id="m-title"></h3><button id="m-x" aria-label="关闭">×</button></header>
+    <div class="body" id="m-body"></div>
+    <footer id="m-foot"></footer>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="/assets/ui.js?v=131"></script>
+<script>
+var $ = function (id) { return document.getElementById(id); };
+var state = { view: 'overview', uq: '', urole: '', ustatus: '', upage: 1,
+              sq: '', sowner: 'owned', spage: 1, me: null };
+
+/* ------------------------------------------------------------------ 基础 */
+function toast(text, bad) {
+  var d = document.createElement('div');
+  if (bad) d.className = 'bad';
+  d.textContent = text;
+  $('toast').appendChild(d);
+  setTimeout(function () { d.remove(); }, 3600);
+}
+
+async function api(path, body, method) {
+  var opt = { method: method || (body ? 'POST' : 'GET') };
+  if (body) { opt.headers = { 'Content-Type': 'application/json' };
+              opt.body = JSON.stringify(body); }
+  var res = await fetch(path, opt);
+  if (res.status === 401) { location.href = '/login'; throw new Error('未登录'); }
+  var d = await res.json().catch(function () { return {}; });
+  if (!res.ok) throw new Error(d.error || ('HTTP ' + res.status));
+  return d;
+}
+
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;   // 一律 textContent：用户输入不回填成 HTML
+  return e;
+}
+
+/* 数字从 0 滚到目标值。纯装饰，但「4」和「4 滚上去」给人的确定感不一样。
+   非数字（比如「—」）直接落地，不做动画。 */
+function countUp(node, target) {
+  var end = Number(target);
+  if (!isFinite(end) || end === 0) { node.textContent = String(target); return; }
+  var t0 = null, dur = 520;
+  function step(ts) {
+    if (t0 === null) t0 = ts;
+    var p = Math.min((ts - t0) / dur, 1);
+    // easeOutCubic：开头快结尾慢，读数不至于一闪而过
+    var v = Math.round(end * (1 - Math.pow(1 - p, 3)));
+    node.textContent = String(v);
+    if (p < 1) requestAnimationFrame(step);
+    else node.textContent = String(target);
+  }
+  requestAnimationFrame(step);
+}
+
+function ts(t) {
+  if (!t) return '—';
+  var d = new Date(t * 1000);
+  var p = function (n) { return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+         ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function ago(t) {
+  if (!t) return '从未';
+  var s = Date.now() / 1000 - t;
+  if (s < 60) return '刚刚';
+  if (s < 3600) return Math.floor(s / 60) + ' 分钟前';
+  if (s < 86400) return Math.floor(s / 3600) + ' 小时前';
+  return Math.floor(s / 86400) + ' 天前';
+}
+
+function pct(v) { return (v * 100).toFixed(v > 0 && v < 0.01 ? 2 : 1) + '%'; }
+
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+/* ------------------------------------------------------------------ 视图切换 */
+function show(view) {
+  state.view = view;
+  ['overview', 'users', 'sessions', 'logins', 'audits'].forEach(function (v) {
+    var sec = $('v-' + v);
+    var on = (v === view);
+    sec.hidden = !on;
+    if (on) {
+      // 重播一次入场动画。直接把 animation 置空再读一次 offsetWidth，
+      // 是让浏览器认定「这一帧变了」，否则同一个动画不会重新触发。
+      sec.style.animation = 'none';
+      void sec.offsetWidth;
+      sec.style.animation = '';
+    }
+  });
+  Array.prototype.forEach.call($('nav').children, function (b) {
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+  // 记住上次看的面板：管理员一天里反复看的是同一块（通常是会话审计）
+  try { localStorage.setItem('law.admin.view', view); } catch (e) { /* 忽略 */ }
+  ({ overview: loadOverview, users: loadUsers, sessions: loadSessions,
+     logins: loadLogins, audits: loadAudits })[view]();
+}
+
+Array.prototype.forEach.call($('nav').children, function (b) {
+  b.onclick = function () { show(b.dataset.view); };
+});
+
+/* ------------------------------------------------------------------ 概览 */
+async function loadOverview() {
+  var d;
+  try { d = await api('/api/admin/overview'); }
+  catch (e) { toast(e.message, true); return; }
+
+  // 「模型状态」不能只念配置：`mode` 是启动时算的，起来就不变了，而余额扣光、
+  // key 被停都发生在启动之后。只写「LLM 在线」，最该知道欠费的人反而看不到。
+  var llmTxt;
+  if (!d.llm.enabled) {
+    llmTxt = d.llm.mode + '（' + (d.llm.fallback_reason || '未配置 API Key') + '）';
+  } else if (d.llm.live === 'error') {
+    llmTxt = 'LLM 在线配置，但最近一次调用失败 → 现在答的是回放（详见上方告警）';
+  } else if (d.llm.live === 'idle') {
+    llmTxt = 'LLM 在线（本次启动后还没调用过）';
+  } else {
+    llmTxt = 'LLM 在线（最近一次调用正常）';
+  }
+
+  $('ov-lead').textContent =
+    '模型状态：' + llmTxt +
+    ' · 语义检索走本地 BM25，不消耗额度' +
+    // 口径必须写明：turns 表是账号体系那一版才建的，之前的会话没有逐轮记录，
+    // 所以「提问 / 拒答 / 自检」的统计基数比「会话数」小得多。不写清楚，
+    // 看的人会以为统计坏了。
+    ' · 提问类指标只统计 v20 之后的轮次（turns 表），与会话总数不同口径';
+
+  var cards = [
+    { k: '注册用户', n: d.users.total,
+      s: '正常 ' + d.users.active + ' · 停用 ' + d.users.banned +
+         (d.users.admin ? ' · 管理员 ' + d.users.admin : '') },
+    { k: '今日提问', n: d.today.turns,
+      s: '累计 ' + d.total.turns + ' 次 · 平均 ' + d.total.avg_steps + ' 步' },
+    { k: '今日拒答率', n: pct(d.today.refuse_rate),
+      s: '拒答 ' + d.today.refused + ' 次', cls: d.today.refuse_rate > 0.3 ? 'warn' : '' },
+    { k: '自检未通过率', n: pct(d.today.unverified_rate),
+      s: '出现未核验引用 ' + d.today.unverified_turns + ' 次',
+      cls: d.today.unverified_rate > 0.2 ? 'bad' : '' },
+    { k: '平均响应', n: (d.today.avg_ms / 1000).toFixed(1) + 's',
+      s: '今日均值，累计 ' + (d.total.avg_ms / 1000).toFixed(1) + 's' },
+    { k: '会话数', n: d.sessions.total,
+      s: '今日新建 ' + d.sessions.today + ' · 未归属 ' + d.sessions.ownerless },
+    { k: '好评率', n: (d.feedback && d.feedback.n) ? pct(d.feedback.up_rate) : '—',
+      s: (d.feedback && d.feedback.n)
+        ? '近 7 天 ' + d.feedback.n + ' 条 · 差评 ' + d.feedback.down
+        : '近 7 天还没有人评价' }
+  ];
+  // 告警先渲染：它在视觉上高于卡片，逻辑顺序也应当一致
+  var ab = $('ov-alerts');
+  ab.textContent = '';
+  var alerts = d.alerts || [];
+  if (!alerts.length) {
+    var c0 = el('div', 'alert clean');
+    c0.appendChild(el('span', 'ic', '✓'));
+    c0.appendChild(el('div', null, '近 1 小时未发现异常'));
+    ab.appendChild(c0);
+  } else {
+    var mark = { warn: '!', bad: '×', info: 'i' };
+    alerts.forEach(function (a, i) {
+      var box2 = el('div', 'alert ' + (a.level || 'info'));
+      box2.style.animationDelay = (i * 50) + 'ms';
+      box2.appendChild(el('span', 'ic', mark[a.level] || '!'));
+      var body = el('div');
+      body.appendChild(el('b', null, a.title));
+      body.appendChild(el('div', 'd', a.detail));
+      box2.appendChild(body);
+      ab.appendChild(box2);
+    });
+  }
+
+  var box = $('ov-cards');
+  box.textContent = '';
+  cards.forEach(function (c, ci) {
+    var card = el('div', 'card' + (c.cls ? ' ' + c.cls : ''));
+    card.style.animation = 'fade-up 320ms var(--ease-out) both';
+    card.style.animationDelay = (ci * 45) + 'ms';
+    card.appendChild(el('div', 'k', c.k));
+    var num = el('div', 'n', '0');
+    card.appendChild(num);
+    card.appendChild(el('div', 's', c.s));
+    box.appendChild(card);
+    countUp(num, c.n);
+  });
+
+  var chart = $('ov-chart');
+  chart.textContent = '';
+  // 后端只返回「有提问的日期」。直接照着画，最近 7 天就只剩一根孤零零的柱子，
+  // 看不出趋势。这里补成固定 7 根，没有数据的那天画 2px 的底座。
+  var byDay = {};
+  (d.by_day || []).forEach(function (x) { byDay[x.day] = x; });
+  var days = [];
+  for (var i = 6; i >= 0; i--) {
+    var dt = new Date(Date.now() - i * 86400000);
+    var key = dt.getFullYear() + '-' + pad2(dt.getMonth() + 1) + '-' +
+              pad2(dt.getDate());
+    days.push(byDay[key] || { day: key, n: 0, refused: 0 });
+  }
+  var max = Math.max.apply(null, days.map(function (x) { return x.n; }));
+  days.forEach(function (x) {
+    var bar = el('div', 'bar');
+    bar.appendChild(el('div', 'v', String(x.n)));
+    var slot = el('div', 'slot');
+    var col = el('div', 'col' + (x.n ? ' has' : ''));
+    col.style.height = (x.n ? Math.max(4, Math.round(x.n / Math.max(1, max) * 100))
+                            : 2) + '%';
+    col.title = x.day + '：' + x.n + ' 次，拒答 ' + x.refused + ' 次';
+    slot.appendChild(col);
+    bar.appendChild(slot);
+    bar.appendChild(el('div', 'd', x.day.slice(5)));
+    chart.appendChild(bar);
+  });
+
+  try {
+    var r = await api('/api/admin/turns?status=refused&limit=6');
+    renderTable($('ov-refused'), r.items, [
+      { k: '用户', f: function (x) { return x.username; } },
+      { k: '问题', f: function (x) { return x.question; }, cls: 'title' },
+      { k: '时间', f: function (x) { return ago(x.ts); }, cls: 'num' }
+    ], null, '没有被拒答的问题');
+  } catch (e) { /* 概览里的次要块，失败不打断 */ }
+
+  // 反馈：差评要能一键跳到那个会话，否则「有 badcase」只等于「有一堆字」
+  var fb = d.feedback || { n: 0, up: 0, down: 0, up_rate: 0, recent_bad: [] };
+  var fbox = $('ov-feedback');
+  fbox.textContent = '';
+  if (!fb.n) {
+    fbox.appendChild(el('div', 'empty', '近 7 天还没有人评价'));
+  } else {
+    var sum = el('div', 'kv');
+    sum.appendChild(el('span', null, '有用 ' + fb.up));
+    sum.appendChild(el('span', null, '没用 ' + fb.down));
+    sum.appendChild(el('span', null, '好评率 ' + pct(fb.up_rate)));
+    fbox.appendChild(sum);
+
+    (fb.recent_bad || []).forEach(function (b) {
+      var row = el('div', 'fbrow');
+      var q = el('div', 'q', b.question);
+      row.appendChild(q);
+      var a = String(b.answer || '').replace(/\s+/g, ' ').trim();
+      if (a) row.appendChild(el('div', 'a', a.slice(0, 120) + (a.length > 120 ? '…' : '')));
+      var go = el('button', 'text-btn', '打开会话');
+      go.type = 'button';
+      go.onclick = function () { openSession(b.session_id); };
+      row.appendChild(go);
+      fbox.appendChild(row);
+    });
+  }
+}
+
+/* ------------------------------------------------------------------ 通用表格 */
+function renderTable(host, rows, cols, actions, emptyText) {
+  host.textContent = '';
+  if (!rows || !rows.length) {
+    host.appendChild(el('div', 'empty', emptyText || '暂无数据'));
+    return;
+  }
+  var t = el('table');
+  var thead = el('thead'), tr = el('tr');
+  cols.forEach(function (c) { tr.appendChild(el('th', null, c.k)); });
+  if (actions) tr.appendChild(el('th', null, '操作'));
+  thead.appendChild(tr);
+  t.appendChild(thead);
+
+  var tb = el('tbody');
+  rows.forEach(function (row) {
+    var r = el('tr');
+    cols.forEach(function (c) {
+      var td = el('td', c.cls || null);
+      var v = c.f(row);
+      if (v instanceof Node) td.appendChild(v); else td.textContent = v == null ? '—' : String(v);
+      if (c.title) td.title = c.title(row) || '';
+      r.appendChild(td);
+    });
+    if (actions) {
+      var td = el('td');
+      var wrap = el('div', 'acts');
+      actions(row).forEach(function (b) { if (b) wrap.appendChild(b); });
+      td.appendChild(wrap);
+      r.appendChild(td);
+    }
+    tb.appendChild(r);
+  });
+  t.appendChild(tb);
+  host.appendChild(t);
+}
+
+function pager(host, total, page, size, onGo) {
+  var pages = Math.max(1, Math.ceil(total / size));
+  host.textContent = '';
+  host.appendChild(el('span', null, '共 ' + total + ' 条 · 第 ' + page + '/' + pages + ' 页'));
+  var prev = el('button', 'btn ghost mini', '上一页');
+  var next = el('button', 'btn ghost mini', '下一页');
+  prev.disabled = page <= 1;
+  next.disabled = page >= pages;
+  prev.onclick = function () { onGo(page - 1); };
+  next.onclick = function () { onGo(page + 1); };
+  host.appendChild(prev);
+  host.appendChild(next);
+}
+
+/* ------------------------------------------------------------------ 用户 */
+async function loadUsers() {
+  var qs = '?q=' + encodeURIComponent(state.uq) +
+           '&role=' + encodeURIComponent(state.urole) +
+           '&status=' + encodeURIComponent(state.ustatus) +
+           '&page=' + state.upage + '&size=20';
+  var d;
+  try { d = await api('/api/admin/users' + qs); }
+  catch (e) { toast(e.message, true); return; }
+
+  renderTable($('u-table'), d.items, [
+    { k: 'ID', f: function (u) { return '#' + u.id; }, cls: 'num' },
+    { k: '用户名', f: function (u) {
+        var s = el('span', null, u.username);
+        if (u.id === state.me.id) s.appendChild(el('span', 'tag', ' 我'));
+        return s;
+      } },
+    { k: '角色', f: function (u) {
+        return el('span', 'tag' + (u.role === 'admin' ? ' adm' : ''),
+                  u.role === 'admin' ? '管理员' : '用户');
+      } },
+    { k: '状态', f: function (u) {
+        var locked = u.locked_until && u.locked_until > Date.now() / 1000;
+        if (locked) return el('span', 'tag warn', '锁定中');
+        return el('span', 'tag' + (u.status === 'active' ? ' ok' : ' bad'),
+                  u.status === 'active' ? '正常' : '已停用');
+      } },
+    { k: '注册', f: function (u) { return ts(u.created_at); }, cls: 'num' },
+    { k: '最后登录', f: function (u) { return ago(u.last_login_at); }, cls: 'num',
+      title: function (u) { return ts(u.last_login_at); } }
+  ], function (u) {
+    var out = [];
+    var locked = u.locked_until && u.locked_until > Date.now() / 1000;
+    if (locked) {
+      out.push(btn('解锁', 'ghost', async function () {
+        await act('/api/admin/users/' + u.id + '/unlock', null, '已解锁');
+        loadUsers();
+      }));
+    }
+    if (u.status === 'active') {
+      out.push(btn('停用', 'danger', async function () {
+        if (!confirm('停用「' + u.username + '」？该用户会立刻被踢下线。')) return;
+        await act('/api/admin/users/' + u.id + '/status', { status: 'banned' }, '已停用');
+        loadUsers();
+      }));
+    } else {
+      out.push(btn('恢复', 'ghost', async function () {
+        await act('/api/admin/users/' + u.id + '/status', { status: 'active' }, '已恢复');
+        loadUsers();
+      }));
+    }
+    out.push(btn(u.role === 'admin' ? '取消管理员' : '设为管理员', 'ghost',
+      async function () {
+        var to = u.role === 'admin' ? 'user' : 'admin';
+        if (to === 'admin' && !confirm('把「' + u.username + '」设为管理员？'
+            + '管理员能看到所有用户的咨询正文。')) return;
+        await act('/api/admin/users/' + u.id + '/role', { role: to }, '角色已修改');
+        loadUsers();
+      }));
+    out.push(btn('重置密码', 'ghost', function () { openReset(u); }));
+    out.push(btn('档案', 'ghost', function () { return openProfile(u); }));
+    out.push(btn('会话', 'ghost', function () {
+      state.sq = u.username; state.spage = 1;
+      $('s-q').value = u.username;
+      show('sessions');
+    }));
+    return out;
+  }, '没有匹配的账号');
+
+  pager($('u-pager'), d.total, d.page, d.size, function (p) {
+    state.upage = p; loadUsers();
+  });
+}
+
+function btn(text, cls, fn) {
+  var b = el('button', 'btn mini' + (cls ? ' ' + cls : ''), text);
+  b.onclick = async function () {
+    b.disabled = true;
+    try { await fn(); } catch (e) { toast(e.message, true); }
+    finally { b.disabled = false; }
+  };
+  return b;
+}
+
+async function act(path, body, okText) {
+  await api(path, body);
+  toast(okText);
+}
+
+$('u-q').oninput = function () {
+  state.uq = this.value.trim(); state.upage = 1;
+  clearTimeout(window._ut);
+  window._ut = setTimeout(loadUsers, 300);
+};
+$('u-role').onchange = function () { state.urole = this.value; state.upage = 1; loadUsers(); };
+$('u-status').onchange = function () { state.ustatus = this.value; state.upage = 1; loadUsers(); };
+
+/* ------------------------------------------------------------------ 模态 */
+/* cancelText 是给只读弹窗用的：那种弹窗没有「确认」语义，
+   底下挂一个「取消」按钮会让人以为点了会撤销什么。 */
+function openModal(title, buildBody, okText, onOk, cancelText) {
+  $('m-title').textContent = title;
+  var body = $('m-body');
+  body.textContent = '';
+  buildBody(body);
+  var foot = $('m-foot');
+  foot.textContent = '';
+  var cancel = el('button', null, cancelText || '取消');
+  cancel.onclick = closeModal;
+  foot.appendChild(cancel);
+  if (okText) {
+    var ok = el('button', 'primary', okText);
+    ok.onclick = async function () {
+      ok.disabled = true;
+      try { var keep = await onOk(); if (!keep) closeModal(); }
+      catch (e) { toast(e.message, true); }
+      finally { ok.disabled = false; }
+    };
+    foot.appendChild(ok);
+  }
+  $('modal').hidden = false;
+}
+
+function closeModal() { $('modal').hidden = true; }
+$('m-x').onclick = closeModal;
+$('modal').onclick = function (e) { if (e.target === $('modal')) closeModal(); };
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && !$('modal').hidden) closeModal();
+});
+
+function openReset(u) {
+  var pwd;
+  openModal('重置「' + u.username + '」的密码', function (b) {
+    b.appendChild(el('label', null, '新密码'));
+    pwd = el('input');
+    pwd.type = 'text';
+    pwd.placeholder = '至少 8 位，含字母和数字';
+    b.appendChild(pwd);
+    b.appendChild(el('div', 'tip',
+      '重置后该用户所有登录状态立即失效，需要重新登录。密码不会记录到审计日志里。'));
+  }, '确认重置', async function () {
+    if (!pwd.value) throw new Error('请填写新密码');
+    await api('/api/admin/users/' + u.id + '/password', { password: pwd.value });
+    toast('密码已重置');
+    loadUsers();
+  });
+}
+
+/* 档案只读视图。管理员为什么需要它：用户说「申请书里申请人那栏是空的」，
+   有这一屏才能一眼分清是没填、还是填了没保存、还是填在另一个账号下。
+   身份证在这里是脱敏的（后端 get_profile(mask=True) 只给前 6 后 4），
+   要看全号只有用户自己那条路——这是 v82 在设计档案表时就定下的边界。 */
+async function openProfile(u) {
+  var d;
+  try { d = await api('/api/admin/users/' + u.id); }
+  catch (e) { toast(e.message, true); return; }
+  // 这一层是 {"user": {...}}，不是裸字典。直接读 d.profile 会永远拿到
+  // undefined，弹窗整屏显示「（未填）」——看着像用户没填，其实是路径错了。
+  // 和 scripts/test_profile_task.py 里那条断言踩的是同一个坑。
+  var uu = d.user || d;
+  var p = uu.profile || {};
+  var ROWS = [
+    ['姓名', 'real_name'], ['身份证', 'id_card'], ['联系电话', 'phone'],
+    ['所在地区', 'region'], ['住址', 'address'],
+    ['单位全称', 'company_name'], ['统一社会信用代码', 'company_code'],
+    ['单位住所', 'company_address'], ['法定代表人', 'company_legal_rep'],
+    ['仲裁委', 'commission']
+  ];
+  var STATE = { pending: '未填写（还没弹过）', done: '已填写',
+                skipped: '用户选择了「先跳过，仅咨询」' };
+  openModal('「' + u.username + '」的个人档案', function (b) {
+    b.appendChild(el('div', 'tip',
+      '档案由用户自己填写，用于自动填仲裁申请书的申请人/被申请人两栏。'
+      + '身份证号在这里只显示前 6 位和后 4 位。'));
+    var g = el('div', 'pf-grid');
+    ROWS.forEach(function (r) {
+      g.appendChild(el('span', 'pf-k', r[0]));
+      var v = p[r[1]] || '';
+      g.appendChild(el('span', 'pf-v' + (v ? '' : ' miss'), v || '（未填）'));
+    });
+    b.appendChild(g);
+    b.appendChild(el('div', 'pf-meta',
+      '已填 ' + (p.filled || []).length + ' / 10 项 · 状态：'
+      + (STATE[p.onboarding] || p.onboarding || '未知') + '\n'
+      + '办理中任务 ' + (uu.n_tasks || 0) + ' 个 · 会话 '
+      + (uu.n_sessions || 0) + ' 次 · 提问 ' + (uu.n_turns || 0) + ' 轮'));
+  }, null, null, '关闭');
+}
+
+$('u-new').onclick = function () {
+  var name, pwd, role;
+  openModal('新建账号', function (b) {
+    b.appendChild(el('label', null, '用户名'));
+    name = el('input');
+    name.placeholder = '2~32 位，中英文均可';
+    b.appendChild(name);
+    b.appendChild(el('label', null, '初始密码'));
+    pwd = el('input');
+    pwd.type = 'text';
+    pwd.placeholder = '至少 8 位，含字母和数字';
+    b.appendChild(pwd);
+    b.appendChild(el('label', null, '角色'));
+    role = el('select');
+    ['user', 'admin'].forEach(function (v) {
+      var o = el('option', null, v === 'admin' ? '管理员' : '普通用户');
+      o.value = v;
+      role.appendChild(o);
+    });
+    b.appendChild(role);
+  }, '创建', async function () {
+    if (!name.value.trim() || !pwd.value) throw new Error('用户名和密码都要填');
+    await api('/api/admin/users', {
+      username: name.value.trim(), password: pwd.value, role: role.value
+    });
+    toast('账号已创建');
+    loadUsers();
+  });
+};
+
+/* ------------------------------------------------------------------ 会话 */
+async function loadSessions() {
+  var qs = '?q=' + encodeURIComponent(state.sq)
+         + '&owner=' + encodeURIComponent(state.sowner)
+         + '&page=' + state.spage + '&size=20';
+  var d;
+  try { d = await api('/api/admin/sessions' + qs); }
+  catch (e) { toast(e.message, true); return; }
+  // 三个数量一起摆出来：默认只看「已归属」，但无主的 84 个必须能看见，
+  // 否则「默认筛选」就变成了悄悄藏数据。
+  var c = d.counts || { any: d.total, owned: d.total, orphan: 0 };
+  $('s-total').textContent = '显示 ' + d.total + ' / 共 ' + c.any
+    + '（无主 ' + c.orphan + '）';
+  var sel = $('s-owner');
+  if (sel && sel.options.length >= 3) {
+    // 按 value 找 option，不靠下标——改顺序时下标会错位，
+    // 上一次就是「界面显示全部、请求发的是仅已归属」
+    Array.prototype.forEach.call(sel.options, function (o) {
+      if (o.value === 'owned') o.textContent = '仅已归属（' + c.owned + '）';
+      if (o.value === 'any') o.textContent = '全部会话（' + c.any + '）';
+      if (o.value === 'orphan') o.textContent = '仅无主（' + c.orphan + '）';
+    });
+  }
+
+  renderTable($('s-table'), d.items, [
+    { k: '用户', f: function (s) {
+        return el('span', s.user_id ? null : 'tag', s.username);
+      } },
+    { k: '第一句提问', f: function (s) { return s.title || '（空会话）'; }, cls: 'title' },
+    { k: '轮次', f: function (s) { return s.n_turns; }, cls: 'num' },
+    { k: '会话 ID', f: function (s) { return s.session_id; }, cls: 'num' },
+    { k: '最后更新', f: function (s) { return ago(s.updated_at); }, cls: 'num',
+      title: function (s) { return ts(s.updated_at); } }
+  ], function (s) {
+    return [btn('查看正文', 'ghost', function () { openSession(s.session_id); })];
+  }, state.sowner === 'orphan'
+      ? '没有无主会话（v20 前的遗留记录已清理）'
+      : '没有匹配的会话');
+
+  pager($('s-pager'), d.total, d.page, d.size, function (p) {
+    state.spage = p; loadSessions();
+  });
+}
+
+$('s-owner').onchange = function () {
+  state.sowner = this.value; state.spage = 1;
+  loadSessions();
+};
+
+$('s-q').oninput = function () {
+  state.sq = this.value.trim(); state.spage = 1;
+  clearTimeout(window._st);
+  window._st = setTimeout(loadSessions, 350);
+};
+
+async function openSession(sid) {
+  var d;
+  try { d = await api('/api/admin/session/' + encodeURIComponent(sid)); }
+  catch (e) { toast(e.message, true); return; }
+
+  openModal('会话 ' + sid, function (b) {
+    var kv = el('div', 'kv');
+    kv.appendChild(el('span', null, '用户：' + d.username));
+    kv.appendChild(el('span', null, '开始：' + ts(d.created_at)));
+    kv.appendChild(el('span', null, '消息 ' + d.messages.length + ' 条'));
+    kv.appendChild(el('span', null, '问答记录 ' + d.turns.length + ' 条'));
+    b.appendChild(kv);
+
+    var slots = Object.keys(d.slots || {});
+    if (slots.length) {
+      var sk = el('div', 'kv');
+      sk.appendChild(el('span', null, '记忆槽位'));
+      slots.forEach(function (k) {
+        sk.appendChild(el('span', null, k + ' = ' + d.slots[k]));
+      });
+      b.appendChild(sk);
+    }
+
+    if (!d.messages.length) {
+      b.appendChild(el('div', 'empty', '这个会话只有记录、没有消息内容'));
+    }
+    d.messages.forEach(function (m) {
+      var row = el('div', 'msg-row ' + m.role);
+      row.appendChild(el('div', 'who',
+        (m.role === 'user' ? '用户' : '助手') + ' · ' + ts(m.ts)));
+      row.appendChild(el('div', 'txt', m.content));
+      b.appendChild(row);
+    });
+
+    if (d.turns.length) {
+      b.appendChild(el('h3', 'k', '本轮记录'));
+      var meta = el('div', 'kv');
+      d.turns.forEach(function (t) {
+        var flags = [t.status, t.steps + ' 步', (t.elapsed_ms / 1000).toFixed(1) + 's',
+                     '引用 ' + t.n_cites];
+        if (t.n_unverified) flags.push('未核验 ' + t.n_unverified);
+        meta.appendChild(el('span', null, flags.join(' · ')));
+      });
+      b.appendChild(meta);
+    }
+  }, null);
+}
+
+/* ------------------------------------------------------------------ 日志 */
+async function loadLogins() {
+  var d;
+  try { d = await api('/api/admin/logins?limit=120'); }
+  catch (e) { toast(e.message, true); return; }
+  renderTable($('l-table'), d.items, [
+    { k: '时间', f: function (x) { return ts(x.ts); }, cls: 'num' },
+    { k: '用户名', f: function (x) { return x.username; } },
+    { k: '结果', f: function (x) {
+        return el('span', 'tag' + (x.ok ? ' ok' : ' bad'), x.ok ? '成功' : '失败');
+      } },
+    { k: '原因', f: function (x) { return x.ok ? '—' : x.reason; }, cls: 'num' },
+    { k: 'IP', f: function (x) { return x.ip || '—'; }, cls: 'num' }
+  ], null, '还没有登录记录');
+}
+
+async function loadAudits() {
+  var d;
+  try { d = await api('/api/admin/audits?limit=120'); }
+  catch (e) { toast(e.message, true); return; }
+  renderTable($('a-table'), d.items, [
+    { k: '时间', f: function (x) { return ts(x.ts); }, cls: 'num' },
+    { k: '管理员', f: function (x) { return x.admin_name; } },
+    { k: '动作', f: function (x) { return x.action; }, cls: 'num' },
+    { k: '对象', f: function (x) { return x.target_type + ' ' + x.target_id; }, cls: 'num' },
+    { k: '说明', f: function (x) { return x.detail || '—'; }, cls: 'title' },
+    { k: 'IP', f: function (x) { return x.ip || '—'; }, cls: 'num' }
+  ], null, '还没有管理操作记录');
+}
+
+/* ------------------------------------------------------------------ 外壳 */
+$('logout').onclick = async function () {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  location.href = '/login';
+};
+$('go-chat').onclick = function () { location.href = '/'; };
+
+(async function boot() {
+  try {
+    var d = await api('/api/auth/me');
+    state.me = d.user;
+    $('me-name').textContent = d.user.username +
+      (d.user.role === 'admin' ? '（管理员）' : '');
+  } catch (e) { return; }
+  // 恢复上次看的面板；localStorage 里是脏值就退回概览
+  var last = 'overview';
+  try {
+    var v = localStorage.getItem('law.admin.view');
+    if (['overview', 'users', 'sessions', 'logins', 'audits'].indexOf(v) >= 0) last = v;
+  } catch (e) { /* 忽略 */ }
+  show(last);
+})();
+</script>
+</body>
+</html>

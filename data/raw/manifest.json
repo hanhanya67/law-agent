@@ -1,0 +1,100 @@
+[
+  {
+    "file": "劳动合同法.txt",
+    "name": "中华人民共和国劳动合同法",
+    "short": "劳动合同法",
+    "level": 1,
+    "effective": "2008-01-01",
+    "status": "现行有效",
+    "source_url": "https://www.mohrss.gov.cn/wap/zc/fgwj/202011/t20201102_394622.html",
+    "note": "2012-12-28 修正，修正后自 2013-07-01 施行"
+  },
+  {
+    "file": "劳动法.txt",
+    "name": "中华人民共和国劳动法",
+    "short": "劳动法",
+    "level": 1,
+    "effective": "1995-01-01",
+    "status": "现行有效",
+    "source_url": "https://www.mohrss.gov.cn/wap/zc/fgwj/202011/t20201102_394625.html",
+    "note": "1994-07-05 通过，1995-01-01 施行"
+  },
+  {
+    "file": "劳动合同法实施条例.txt",
+    "name": "中华人民共和国劳动合同法实施条例",
+    "short": "实施条例",
+    "level": 2,
+    "effective": "2008-09-18",
+    "status": "现行有效",
+    "source_url": "https://www.gov.cn/flfg/2008-09/19/content_1099500.htm",
+    "note": "国务院令第535号，共6章38条"
+  },
+  {
+    "file": "劳动争议调解仲裁法.txt",
+    "name": "中华人民共和国劳动争议调解仲裁法",
+    "short": "调解仲裁法",
+    "level": 1,
+    "effective": "2008-05-01",
+    "status": "现行有效",
+    "source_url": "https://www.gov.cn/flfg/2007-12/29/content_847310.htm"
+  },
+  {
+    "file": "劳动争议司法解释一.txt",
+    "name": "最高人民法院关于审理劳动争议案件适用法律问题的解释（一）",
+    "short": "劳动争议解释一",
+    "level": 4,
+    "effective": "2021-01-01",
+    "status": "部分失效",
+    "source_url": "https://www.court.gov.cn/zixun/xiangqing/282121.html",
+    "note": "法释〔2020〕26号，共54条。第三十二条第一款自 2025-09-01 起被解释（二）第二十一条废止",
+    "repealed_articles": [
+      {
+        "article_no": 32,
+        "paragraph": 1,
+        "repealed_by": "劳动争议解释二",
+        "repealed_effective": "2025-09-01",
+        "repealed_note": "本条第一款（用人单位与已依法享受养老保险待遇或领取退休金的人员发生用工争议，按劳务关系处理）自 2025-09-01 起已废止，依据《最高人民法院关于审理劳动争议案件适用法律问题的解释（二）》（法释〔2025〕12号）第二十一条。本条第二款（停薪留职、未达法定退休年龄的内退、下岗待岗、经营性停产放长假人员与新的用人单位发生用工争议，按劳动关系处理）仍然有效。"
+      }
+    ]
+  },
+  {
+    "file": "劳动争议司法解释二.txt",
+    "name": "最高人民法院关于审理劳动争议案件适用法律问题的解释（二）",
+    "short": "劳动争议解释二",
+    "level": 4,
+    "effective": "2025-09-01",
+    "status": "现行有效",
+    "source_url": "https://www.court.gov.cn/zixun/xiangqing/472691.html",
+    "note": "法释〔2025〕12号，共21条。第二十一条废止了解释（一）第三十二条第一款"
+  },
+  {
+    "file": "合同法.txt",
+    "name": "中华人民共和国合同法",
+    "short": "合同法",
+    "level": 1,
+    "effective": "1999-10-01",
+    "status": "已废止",
+    "superseded_by": "中华人民共和国民法典",
+    "source_url": "https://www.yongji.gov.cn/doc/2021/05/31/10322931.shtml",
+    "note": "共428条。自 2021-01-01 民法典施行之日起整体废止（民法典第一千二百六十条）。仅第114条建立了到民法典第585条的承继映射，其余条文的承继关系未逐一映射。",
+    "repealed_articles": [
+      {
+        "article_no": 114,
+        "paragraph": null,
+        "repealed_by": "民法典",
+        "repealed_effective": "2021-01-01",
+        "repealed_note": "本法已自 2021-01-01 起整体废止，依据《中华人民共和国民法典》第一千二百六十条。本条关于违约金的规定由《中华人民共和国民法典》第五百八十五条承继，规则一致：约定的违约金过分高于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以适当减少。回答时应当告知用户引用民法典第五百八十五条，而不是继续引用合同法第一百一十四条。"
+      }
+    ]
+  },
+  {
+    "file": "民法典.txt",
+    "name": "中华人民共和国民法典",
+    "short": "民法典",
+    "level": 1,
+    "effective": "2021-01-01",
+    "status": "现行有效",
+    "source_url": "https://news.cnr.cn/native/gd/20200602/t20200602_525113208.shtml",
+    "note": "共7编1260条。抓取自央广网受权发布稿的 7 个分页，条号 1–1260 连续校验通过。"
+  }
+]

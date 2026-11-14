@@ -1,0 +1,50 @@
+{"id": "s01", "type": "single", "question": "入职三个月了公司一直没跟我签书面合同，我可以主张什么", "gold": ["劳动合同法_82"], "keywords": ["二倍", "工资"], "must_refuse": false, "note": "82条：超一个月不满一年未签，每月二倍工资"}
+{"id": "s02", "type": "single", "question": "经济补偿按什么标准算，每满一年给几个月工资", "gold": ["劳动合同法_47"], "keywords": ["每满一年", "一个月工资"], "must_refuse": false, "note": "47条基本标准"}
+{"id": "s03", "type": "single", "question": "工作日加班和法定节假日加班，工资倍数一样吗", "gold": ["劳动法_44"], "keywords": ["150", "300"], "must_refuse": false, "note": "44条三档标准（50%/150%/200%/300%）。关键词用阿拉伯数字：模型习惯写150%，写中文全称的很少。", "relabel_from": {"keywords": ["百分之一百五十", "百分之三百"]}, "relabeled_at": "2026-10-24"}
+{"id": "s04", "type": "single", "question": "签三年期劳动合同，试用期最长能定多久", "gold": ["劳动合同法_19"], "keywords": ["六个月"], "must_refuse": false, "note": "19条按期限分档"}
+{"id": "s05", "type": "single", "question": "公司一直不给我缴社保，我可以直接走人吗", "gold": ["劳动合同法_38"], "keywords": ["社会保险", "解除"], "must_refuse": false, "note": "38条被迫解除"}
+{"id": "s06", "type": "single", "question": "公司违法把我辞退了，赔偿金怎么算", "gold": ["劳动合同法_87"], "keywords": ["二倍"], "must_refuse": false, "note": "87条二倍赔偿金"}
+{"id": "s07", "type": "single", "question": "公司资金紧张，可以拿产品抵我的工资吗", "gold": ["劳动法_50"], "keywords": ["货币形式", "按月支付"], "must_refuse": false, "note": "50条工资形式"}
+{"id": "s08", "type": "single", "question": "离职之后过多久就不能申请劳动仲裁了", "gold": ["调解仲裁法_27"], "keywords": ["一年", "时效"], "must_refuse": false, "note": "27条一年时效"}
+{"id": "s09", "type": "single", "question": "连续签了几次固定期限合同之后，能要求签无固定期限吗", "gold": ["劳动合同法_14"], "keywords": ["连续订立二次", "无固定期限"], "must_refuse": false, "note": "14条第三项"}
+{"id": "s10", "type": "single", "question": "哪些情况下公司解除劳动合同要给经济补偿", "gold": ["劳动合同法_46"], "keywords": ["经济补偿"], "must_refuse": false, "note": "46条七项情形"}
+{"id": "s11", "type": "single", "question": "算经济补偿的时候，月工资是按合同上写的算还是按实际发的算", "gold": ["实施条例_27"], "keywords": ["应得工资", "平均工资"], "must_refuse": false, "note": "实施条例27条口径"}
+{"id": "s12", "type": "single", "question": "公司说我不能胜任工作，能不能明天就让我走", "gold": ["劳动合同法_40"], "keywords": ["提前三十日", "培训", "调整工作岗位"], "must_refuse": false, "note": "40条需提前通知或代通知金"}
+{"id": "s13", "type": "single", "question": "用工一个月之内必须签书面劳动合同吗", "gold": ["劳动合同法_10"], "keywords": ["一个月内", "书面"], "must_refuse": false, "note": "10条"}
+{"id": "s14", "type": "single", "question": "合同里约定的违约金比实际损失高很多，能请求调低吗", "gold": ["民法典_585"], "keywords": ["过分高于", "适当减少"], "must_refuse": false, "note": "585条违约金调减"}
+{"id": "s15", "type": "single", "question": "公司能不能只跟我签一个试用期协议，不签正式合同", "gold": ["劳动合同法_19"], "keywords": ["仅约定试用期", "试用期不成立"], "must_refuse": false, "note": "19条末款"}
+{"id": "s16", "type": "single", "question": "我工作了一年零三个月，经济补偿算几个月", "gold": ["劳动合同法_47"], "keywords": ["一年", "半个月"], "must_refuse": false, "note": "47条满一年加不满六个月部分"}
+{"id": "s17", "type": "single", "question": "休息日安排我加班又不给补休，应该给多少工资", "gold": ["劳动法_44"], "keywords": ["百分之二百", "补休"], "must_refuse": false, "note": "44条第二项"}
+{"id": "s18", "type": "single", "question": "还在职的时候工资一直被拖欠，仲裁时效怎么算", "gold": ["调解仲裁法_27"], "keywords": ["劳动报酬", "终止之日起一年"], "must_refuse": false, "note": "27条末款特殊规则"}
+{"id": "m01", "type": "multi", "question": "公司既没跟我签合同，又违法把我辞退了，我能主张哪些赔偿", "gold": ["劳动合同法_82", "劳动合同法_87"], "keywords": ["二倍"], "must_refuse": false, "note": "82二倍工资 + 87二倍赔偿金"}
+{"id": "m02", "type": "multi", "question": "违法辞退的赔偿金具体按什么标准计算", "gold": ["劳动合同法_87", "劳动合同法_47"], "keywords": ["第四十七条", "二倍"], "must_refuse": false, "note": "87条指向47条标准，需跨条"}
+{"id": "m03", "type": "multi", "question": "公司不缴社保我被迫离职，能不能要经济补偿", "gold": ["劳动合同法_38", "劳动合同法_46"], "keywords": ["社会保险", "经济补偿"], "must_refuse": false, "note": "38条解除权 + 46条第一项补偿"}
+{"id": "m04", "type": "multi", "question": "公司以我不能胜任为由辞退，除了给补偿还要提前通知吗", "gold": ["劳动合同法_40", "劳动合同法_46"], "keywords": ["提前三十日", "经济补偿"], "must_refuse": false, "note": "40条程序 + 46条第三项补偿"}
+{"id": "m05", "type": "multi", "question": "一直没签书面合同，满一年之后是不是就自动变成无固定期限了", "gold": ["劳动合同法_10", "劳动合同法_14"], "keywords": ["无固定期限", "书面"], "must_refuse": false, "note": "10条订立义务 + 14条无固定期限"}
+{"id": "m06", "type": "multi", "question": "经济补偿的月工资包不包括奖金和补贴", "gold": ["劳动合同法_47", "实施条例_27"], "keywords": ["奖金", "津贴"], "must_refuse": false, "note": "47条定标准 + 实施条例27条定口径"}
+{"id": "m07", "type": "multi", "question": "公司拖欠工资，我能不能以此为由解除合同并要求补偿", "gold": ["劳动法_50", "劳动合同法_38"], "keywords": ["拖欠", "解除"], "must_refuse": false, "note": "50条支付义务 + 38条第二项解除权"}
+{"id": "m08", "type": "multi", "question": "试用期被公司辞退，有没有经济补偿", "gold": ["劳动合同法_19", "劳动合同法_46"], "keywords": ["试用期", "经济补偿"], "must_refuse": false, "note": "19条试用期规则 + 46条补偿情形"}
+{"id": "m09", "type": "multi", "question": "已经连续签了两次固定期限合同，公司到期不续签怎么办", "gold": ["劳动合同法_14", "劳动合同法_46"], "keywords": ["连续订立二次", "经济补偿"], "must_refuse": false, "note": "14条应订无固定期限 + 46条第五项"}
+{"id": "m10", "type": "refuse", "question": "加班费的计算基数是什么，按合同工资还是实际工资", "gold": [], "keywords": [], "must_refuse": true, "note": "【2026-10-24 重标】原 gold 为 劳动法44+实施条例27，但两条都答不了「计算基数」：44条讲倍数，实施条例27条讲经济补偿月工资。加班费基数见《工资支付暂行规定》第13条，该规定未入库。模型拒答是诚实且正确的处理。", "relabel_from": {"type": "multi", "gold": ["劳动法_44", "实施条例_27"], "keywords": ["工资", "平均"], "must_refuse": false, "note": "44条标准 + 实施条例27条工资口径（口径不完全等同，评测时注意）"}, "relabeled_at": "2026-10-24"}
+{"id": "m11", "type": "multi", "question": "公司违法解除合同，我可以要求继续履行而不是拿赔偿吗", "gold": ["劳动合同法_87", "劳动合同法_47"], "keywords": ["赔偿金"], "must_refuse": false, "note": "87条赔偿金 + 47条标准；继续履行48条未收录，属部分覆盖"}
+{"id": "m12", "type": "multi", "question": "离职后申请仲裁的期限是多久，拖欠工资的情况有什么不同", "gold": ["调解仲裁法_27", "劳动法_50"], "keywords": ["一年", "劳动报酬"], "must_refuse": false, "note": "27条一般时效 + 末款特殊规则"}
+{"id": "v01", "type": "version", "question": "合同法第114条关于违约金过高的规定，这条还有效吗", "gold": ["合同法_114", "民法典_585"], "keywords": ["已废止", "五百八十五"], "must_refuse": false, "note": "版本感知主场景"}
+{"id": "v02", "type": "version", "question": "违约金过分高于造成的损失，可以请求法院减少吗，依据哪一条", "gold": ["民法典_585"], "keywords": ["过分高于", "减少"], "must_refuse": false, "note": "应引现行585条"}
+{"id": "v03", "type": "version", "question": "以前合同法是第114条，现在民法典施行了还适用吗", "gold": ["合同法_114", "民法典_585"], "keywords": ["废止", "民法典"], "must_refuse": false, "note": "必须指出替代关系"}
+{"id": "v04", "type": "version", "question": "民法典施行之后，违约金调整的条文变了吗", "gold": ["民法典_585", "合同法_114"], "keywords": ["民法典", "违约金"], "must_refuse": false, "note": "新旧对照"}
+{"id": "v05", "type": "version", "question": "合同是2020年签的，里面约定的违约金条款现在适用哪部法", "gold": ["民法典_585", "合同法_114"], "keywords": ["民法典"], "must_refuse": false, "note": "时间效力判断"}
+{"id": "v06", "type": "version", "question": "现在还能引用合同法第一百一十四条吗", "gold": ["合同法_114", "民法典_585"], "keywords": ["废止", "五百八十五"], "must_refuse": false, "note": "直接问可用性"}
+{"id": "r01", "type": "refuse", "question": "公司食堂的饭菜太难吃了，我能起诉公司吗", "gold": [], "keywords": [], "must_refuse": true, "note": "不是法律问题"}
+{"id": "r02", "type": "refuse", "question": "同事借了我两万块钱一直不还，怎么办", "gold": [], "keywords": [], "must_refuse": true, "note": "民间借贷，库内无条文"}
+{"id": "r03", "type": "refuse", "question": "离婚的时候房子怎么分", "gold": [], "keywords": [], "must_refuse": true, "note": "婚姻家庭，库内无"}
+{"id": "r04", "type": "refuse", "question": "被邻居家的狗咬了，怎么索赔", "gold": [], "keywords": [], "must_refuse": true, "note": "侵权责任，库内无"}
+{"id": "r05", "type": "refuse", "question": "公司要求穿工装，工装费应该谁出", "gold": [], "keywords": [], "must_refuse": true, "note": "劳动法问题但库内无直接条文，测诚实拒答"}
+{"id": "r06", "type": "single", "question": "竞业限制的补偿金标准是多少", "gold": ["劳动争议解释一_36"], "keywords": ["竞业限制", "30%", "最低工资标准"], "must_refuse": false, "note": "【2026-10-24 重标】原标 refuse，理由是「劳动合同法23/24条未收录」。扩语料后解释一36条已入库：未约定经济补偿的，按解除前12个月平均工资的30%按月支付；该30%低于劳动合同履行地最低工资标准的，按最低工资标准支付。", "relabel_from": {"type": "refuse", "must_refuse": true, "note": "劳动合同法23/24条未收录"}, "relabeled_at": "2026-10-24"}
+{"id": "r07", "type": "refuse", "question": "工伤十级伤残大概能赔多少钱", "gold": [], "keywords": [], "must_refuse": true, "note": "工伤保险条例未收录"}
+{"id": "r08", "type": "single", "question": "女职工产假能休多少天", "gold": ["劳动法_62"], "keywords": ["产假", "九十天"], "must_refuse": false, "note": "【2026-10-24 重标】劳动法62条：女职工生育享受不少于九十天的产假。局限：《女职工劳动保护特别规定》的98天未收录，库内只能答到90天。这条同时说明语料还有缺口，见待办。", "relabel_from": {"type": "refuse", "must_refuse": true, "note": "女职工劳动保护特别规定未收录"}, "relabeled_at": "2026-10-24"}
+{"id": "r09", "type": "single", "question": "公司可以随便给我调岗吗", "gold": ["劳动合同法_35"], "keywords": ["协商一致", "变更", "书面形式"], "must_refuse": false, "note": "【2026-10-24 重标】劳动合同法35条：变更劳动合同约定内容需协商一致并采书面形式，故单位不能单方随意调岗。注意：本条与问题无字面重合（「调岗」不出现在条文里），纯 BM25 检不到——保留此题正是为了暴露词汇不匹配，作为混合检索的对照。", "relabel_from": {"type": "refuse", "must_refuse": true, "note": "真实问题但库内无直接条文"}, "relabeled_at": "2026-10-24"}
+{"id": "r10", "type": "refuse", "question": "年终奖不发能不能去仲裁", "gold": [], "keywords": [], "must_refuse": true, "note": "库内无年终奖专门规定"}
+{"id": "r11", "type": "single", "question": "个体工商户雇人算不算劳动关系", "gold": ["劳动合同法_2", "劳动法_2"], "keywords": ["个体经济组织", "用人单位"], "must_refuse": false, "note": "【2026-10-24 重标】劳动合同法2条与劳动法2条均将「个体经济组织」列为用人单位，故个体工商户与雇工之间可以成立劳动关系。", "relabel_from": {"type": "refuse", "must_refuse": true, "note": "主体资格问题，库内无"}, "relabeled_at": "2026-10-24"}
+{"id": "r12", "type": "refuse", "question": "实习生有没有工资", "gold": [], "keywords": [], "must_refuse": true, "note": "实习生非劳动关系，库内无"}
+{"id": "r13", "type": "single", "question": "公司让我签自愿放弃社保的承诺书，这个有效吗", "gold": ["劳动争议解释二_19"], "keywords": ["社会保险费", "无效", "经济补偿"], "must_refuse": false, "note": "【2026-10-24 重标】解释二19条：约定或承诺无需缴纳社会保险费的，认定无效；劳动者可据此依劳动合同法38条第一款第三项解除并要求经济补偿。该条 2025-09-01 才施行，17 条语料的时代不可能有。", "relabel_from": {"type": "refuse", "must_refuse": true, "note": "库内无直接条文，但相关度高，是难点题"}, "relabeled_at": "2026-10-24"}
+{"id": "r14", "type": "refuse", "question": "外卖骑手和平台之间是劳动关系吗", "gold": [], "keywords": [], "must_refuse": true, "note": "新业态用工，库内无"}

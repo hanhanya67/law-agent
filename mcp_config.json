@@ -1,0 +1,15 @@
+{
+  "_说明": "MCP 客户端配置示例。cwd 要改成你解压 law-agent 的绝对路径；command 需要指向装了 requirements.txt 的 Python（本机可直接用 D:/law-agent/.venv/Scripts/python.exe）。",
+  "mcpServers": {
+    "law-agent": {
+      "command": "python",
+      "args": ["-m", "app.mcp_server"],
+      "cwd": "D:/law-agent",
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "DEEPSEEK_API_KEY": ""
+      }
+    }
+  }
+}

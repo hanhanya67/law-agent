@@ -1,0 +1,32 @@
+__pycache__/
+*.py[cod]
+.env
+data/law.db
+data/eval.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+# 数据库备份（含全部对话 + 账号哈希，绝不进仓库）
+data/*.db.bak*
+data/*.db-*.bak*
+models/
+.venv/
+# 改动前的代码快照：只用于回退，不进仓库（v19 / v126 等都算）
+.snapshot_v*/
+# 页面截图工具的产物（Edge 的 profile 有几十 MB）
+eval/_shot/
+eval/_server.log
+eval/_*.log
+
+# 数据库备份（含全部对话与账号哈希，绝不进仓库）
+data/backups/
+# 无主会话导出（含对话正文）
+data/archives/
+
+# 语料/配置的 .bak_ 备份（旧版本快照，不进仓库）
+data/*.bak_*
+data/*.bak-*
+
+# 根目录一次性测试文件（.bat 占用测试、括号探测脚本）
+_bat_occupied.bat
+_paren.js

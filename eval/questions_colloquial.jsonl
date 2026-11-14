@@ -1,0 +1,14 @@
+{"id": "c01", "type": "single", "question": "老板突然让我明天别来了，也没说为什么", "gold": ["劳动合同法_87"], "keywords": ["二倍"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：未说明解除理由，按违法解除处理"}
+{"id": "c02", "type": "single", "question": "公司让我换个部门，我不想去行不行", "gold": ["劳动合同法_35"], "keywords": ["协商一致"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：调岗 = 变更劳动合同"}
+{"id": "c03", "type": "single", "question": "上班半年了还没跟我签合同", "gold": ["劳动合同法_82"], "keywords": ["二倍"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：不签书面合同"}
+{"id": "c04", "type": "single", "question": "晚上留下来干活给不给钱", "gold": ["劳动法_44"], "keywords": ["百分之一百五十"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：延长工作时间"}
+{"id": "c05", "type": "single", "question": "公司社保一分钱没交，我不想干了", "gold": ["劳动合同法_38"], "keywords": ["社会保险费"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：未依法缴纳社保"}
+{"id": "c06", "type": "single", "question": "被开除了能拿多少钱", "gold": ["劳动合同法_87"], "keywords": ["二倍"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：赔偿金计算"}
+{"id": "c07", "type": "single", "question": "干了三年走了给几个月工资", "gold": ["劳动合同法_47"], "keywords": ["满一年"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：经济补偿按年限算"}
+{"id": "c08", "type": "single", "question": "试工期能定多长", "gold": ["劳动合同法_19"], "keywords": ["六个月"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：试用期上限"}
+{"id": "c09", "type": "single", "question": "工资老是不发，拖了两三个月了", "gold": ["劳动合同法_30"], "keywords": ["劳动报酬"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：拖欠劳动报酬"}
+{"id": "c10", "type": "single", "question": "多久以后就不能去告了", "gold": ["调解仲裁法_27"], "keywords": ["一年"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：仲裁时效"}
+{"id": "c11", "type": "single", "question": "干久了能不能要个长期合同", "gold": ["劳动合同法_14"], "keywords": ["无固定期限"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：无固定期限劳动合同"}
+{"id": "c12", "type": "single", "question": "离职后公司不让我去同行上班，也不给钱", "gold": ["劳动争议解释一_36"], "keywords": ["竞业限制"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：竞业限制补偿"}
+{"id": "c13", "type": "single", "question": "公司让我签个自愿不交社保的东西，说签了就不怪我", "gold": ["劳动争议解释二_19"], "keywords": ["社会保险"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：放弃社保承诺的效力"}
+{"id": "c14", "type": "single", "question": "送外卖的算不算公司员工", "gold": ["劳动合同法_7"], "keywords": ["劳动关系"], "must_refuse": false, "expect_intent": "case_consult", "note": "口语版：劳动关系认定"}

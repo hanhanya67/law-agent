@@ -1,0 +1,20 @@
+# ---- 核心：只装这两个就能跑 Agent 内核和命令行版本 ----
+pydantic>=2.9.0
+# 不再依赖 openai SDK：它硬依赖 jiter（Rust 编译的 .pyd），在启用了
+# 应用程序控制策略（AppLocker / WDAC）的 Windows 上会被拦截，表现为
+# ImportError: DLL load failed while importing jiter。
+# 现在统一走 app/_api.py，用标准库 urllib 直连 /chat/completions，零依赖。
+
+# ---- Web 界面（可选，不装也能用 python -m app.cli）----
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+
+# ---- 只有跑回归才需要（scripts/test_auth.py 用 TestClient 打真实接口）----
+# 不装也能起服务、能正常问答，只是「认证与越权」那一个套件会在 import 阶段红。
+# 具体装哪个取决于 starlette 版本：
+#   starlette 1.9.x  → 需要 httpx
+#   starlette 1.10+  → 报 `requires the httpx2 package`，按提示改装 httpx2
+# 实测踩过：系统里 fastapi 0.162 / starlette 1.10 时不装 httpx2，
+# 该套件会以 RuntimeError 崩掉，看起来像「代码坏了」，其实只是缺测试依赖。
+httpx>=0.27.0
+# httpx2  # starlette 1.10+ 的环境改成这一行
